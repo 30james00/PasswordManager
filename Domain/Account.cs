@@ -7,4 +7,6 @@ public class Account
     public String PasswordHash { get; set; }
     public String Salt { get; set; }
     public bool IsPasswordKeptAsHash { get; set; }
+    public List<SavedPassword> SavedPasswords { get; set; } = new List<SavedPassword>();
+    public List<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }

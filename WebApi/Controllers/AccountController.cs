@@ -14,10 +14,17 @@ public class AccountController : ControllerBase
     {
         return Unauthorized();
     }
-    
+
     [AllowAnonymous]
     [HttpPost("register")]
     public async Task<ActionResult<AccountDto>> Register(RegisterDto loginDto)
+    {
+        return Unauthorized();
+    }
+
+    [Authorize]
+    [HttpPatch("change-password")]
+    public async Task<ActionResult<AccountDto>> ChangePassword(ChangePasswordDto changePasswordDto)
     {
         return Unauthorized();
     }

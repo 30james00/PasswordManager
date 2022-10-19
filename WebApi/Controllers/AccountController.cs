@@ -19,6 +19,8 @@ public class AccountController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<AccountDto>> Register(RegisterDto loginDto)
     {
+        
+        
         return Unauthorized();
     }
 

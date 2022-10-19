@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using PasswordManager.Application.Security.Hash;
+using PasswordManager.Application.Security.Token;
 using Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +14,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("SQLite")));
+
+builder.Services.AddTransient<ITokenService, TokenService>();
+builder.Services.AddTransient<IHashService, HashService>();
 
 var app = builder.Build();
 

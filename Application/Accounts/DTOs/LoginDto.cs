@@ -1,4 +1,4 @@
-namespace PasswordManager.Application.DTOs.Account
+namespace PasswordManager.Application.Accounts.DTOs
 {
     public class LoginDto
     {

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace PasswordManager.Application.DTOs.Account;
+namespace PasswordManager.Application.Accounts.DTOs;
 
 public class ChangePasswordDto
 {

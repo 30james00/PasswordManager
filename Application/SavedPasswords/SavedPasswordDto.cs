@@ -1,4 +1,4 @@
-namespace PasswordManager.Application.DTOs;
+namespace PasswordManager.Application.SavedPasswords;
 
 public class SavedPasswordDto
 {

@@ -1,7 +1,7 @@
 using Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PasswordManager.Application.DTOs;
+using PasswordManager.Application.SavedPasswords;
 
 namespace PasswordManager.Controllers;
 

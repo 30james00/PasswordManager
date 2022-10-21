@@ -1,4 +1,4 @@
-namespace Persistence.EntityTypeConfigurations;
+namespace Infrastructure.EntityTypeConfigurations;
 
 public class EntityTypeConfigurationsEntrypoint
 {

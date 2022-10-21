@@ -2,7 +2,7 @@ using Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Persistence.EntityTypeConfigurations
+namespace Infrastructure.EntityTypeConfigurations
 {
     public class AccountEntityTypeConfiguration : IEntityTypeConfiguration<Account>
     {

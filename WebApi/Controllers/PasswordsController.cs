@@ -2,6 +2,7 @@ using Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.SavedPasswords;
+using PasswordManager.Application.SavedPasswords.DTOs;
 
 namespace PasswordManager.Controllers;
 
@@ -18,14 +19,14 @@ public class PasswordsController : ControllerBase
 
     [Authorize]
     [HttpPost]
-    public async Task<ActionResult<SavedPasswordDto>> CreatePassword(SavedPassword password)
+    public async Task<ActionResult<SavedPasswordDto>> CreatePassword(CreatePasswordDto password)
     {
         return Unauthorized();
     }
 
     [Authorize]
     [HttpPatch]
-    public async Task<ActionResult<SavedPasswordDto>> EditPassword(SavedPassword password)
+    public async Task<ActionResult<SavedPasswordDto>> EditPassword(EditPasswordDto password)
     {
         return Unauthorized();
     }

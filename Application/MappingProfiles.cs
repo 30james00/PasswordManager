@@ -1,6 +1,7 @@
 using AutoMapper;
 using Domain;
 using PasswordManager.Application.SavedPasswords;
+using PasswordManager.Application.SavedPasswords.DTOs;
 
 namespace PasswordManager.Application;
 

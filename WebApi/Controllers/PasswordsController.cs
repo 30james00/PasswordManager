@@ -40,7 +40,7 @@ public class PasswordsController : ControllerBase
 
     [Authorize]
     [HttpGet("decrypt/{id:guid}")]
-    public async Task<ActionResult<string>> DecryptPassword(Guid id)
+    public async Task<ActionResult<string>> DecryptPassword(Guid id, string masterPassword)
     {
         return Unauthorized();
     }

@@ -34,7 +34,7 @@ public class SavedPasswordService : ISavedPasswordService
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task<string> DecryptPassword()
+    public async Task<string> DecryptPassword(Guid id, string masterPassword)
     {
         throw new NotImplementedException();
     }

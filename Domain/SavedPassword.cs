@@ -7,6 +7,7 @@ public class SavedPassword
     public string WebAddress { get; set; } = null;
     public string? Description { get; set; }
     public string? Login { get; set; }
+    public string Iv { get; set; } = null!;
 
     public Account Account { get; set; } = null!;
     public Guid AccountId { get; set; }

@@ -85,6 +85,10 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Iv")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Login")
                         .HasMaxLength(30)
                         .HasColumnType("TEXT");

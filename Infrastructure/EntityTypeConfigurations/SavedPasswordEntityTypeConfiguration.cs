@@ -11,6 +11,7 @@ public class SavedPasswordEntityTypeConfiguration : IEntityTypeConfiguration<Sav
         builder.Property(x => x.Password).HasMaxLength(256).IsRequired();
         builder.Property(x => x.WebAddress).HasMaxLength(256).IsRequired();
         builder.Property(x => x.Description).HasMaxLength(256);
+        builder.Property(x => x.Iv).IsRequired();
         builder.Property(x => x.Login).HasMaxLength(30);
         builder.Property(x => x.AccountId).IsRequired();
     }

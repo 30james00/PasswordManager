@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using PasswordManager.Middleware;
 
 var clientOrigin = "_clientOrigin";
 
@@ -18,9 +19,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: clientOrigin,
-        builder =>
+        policyBuilder =>
         {
-            builder
+            policyBuilder
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader();
@@ -54,7 +55,7 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        { securityScheme, System.Array.Empty<string>() }
+        { securityScheme, Array.Empty<string>() }
     });
 });
 
@@ -115,6 +116,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

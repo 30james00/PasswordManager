@@ -40,11 +40,13 @@ public class AccountService : IAccountService
         };
 
         await _dataContext.Accounts.AddAsync(account);
-        return await Login(new LoginDto
+        var result = await _dataContext.SaveChangesAsync();
+        if (result <= 0) _logger.LogError("Error saving new Account to Database");
+        return new AccountDto
         {
             Login = account.Login,
-            Password = account.PasswordHash,
-        });
+            Token = _tokenService.CreateToken(account),
+        };
     }
 
     public async Task<AccountDto> Login(LoginDto loginDto)

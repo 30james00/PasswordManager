@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PasswordManager.Application.Security.Hash;
 using PasswordManager.Application.Security.Token;
 using Infrastructure;
+using PasswordManager.Application.Accounts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,8 @@ builder.Services.AddDbContext<DataContext>(options =>
 
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IHashService, HashService>();
+builder.Services.AddTransient<IAccountService, AccountService>();
+builder.Services.AddTransient<IUserAccessor, UserAccessor>();
 
 var app = builder.Build();
 

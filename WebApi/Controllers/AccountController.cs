@@ -47,8 +47,7 @@ public class AccountController : ControllerBase
         if (userId == null) throw new KeyNotFoundException("User not logged in");
         if (!await _accountService.CheckPassword(Guid.Parse(userId), changePasswordDto.OldPassword))
             return Unauthorized();
-        await _accountService.ChangePassword(Guid.Parse(userId), changePasswordDto.NewPassword,
+        return await _accountService.ChangePassword(Guid.Parse(userId), changePasswordDto.NewPassword,
             changePasswordDto.IsPasswordKeptAsHash);
-        return Ok();
     }
 }

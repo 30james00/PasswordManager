@@ -57,7 +57,7 @@ public class AccountService : IAccountService
         };
     }
 
-    public async Task ChangePassword(Guid id, string newPassword, bool isPasswordKeptAsHash)
+    public async Task<AccountDto> ChangePassword(Guid id, string newPassword, bool isPasswordKeptAsHash)
     {
         //get Account
         var account = await _dataContext.Accounts.FirstAsync(x => x.Id == id);
@@ -70,6 +70,11 @@ public class AccountService : IAccountService
         account.IsPasswordKeptAsHash = isPasswordKeptAsHash;
         var result = await _dataContext.SaveChangesAsync();
         if (result <= 0) _logger.LogError("Error saving new Password to Database");
+        return new AccountDto
+        {
+            Login = account.Login,
+            Token = _tokenService.CreateToken(account),
+        };
     }
 
     public async Task<bool> IfAccountExists(string login)

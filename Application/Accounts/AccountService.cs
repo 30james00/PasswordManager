@@ -59,25 +59,17 @@ public class AccountService : IAccountService
 
     public async Task ChangePassword(Guid id, string newPassword, bool isPasswordKeptAsHash)
     {
-        try
-        {
-            //get Account
-            var account = await _dataContext.Accounts.FirstAsync(x => x.Id == id);
-            //generate new salt and passwordHash
-            var salt = GenerateSalt();
-            var passwordHash = GetPasswordHash(newPassword, salt, isPasswordKeptAsHash);
-            //save changes
-            account.PasswordHash = passwordHash;
-            account.Salt = salt;
-            account.IsPasswordKeptAsHash = isPasswordKeptAsHash;
-            var result = await _dataContext.SaveChangesAsync();
-            if (result <= 0) _logger.LogError("Error saving new Password to Database");
-        }
-        catch (Exception e)
-        {
-            _logger.LogError("Account not found");
-            Console.WriteLine(e);
-        }
+        //get Account
+        var account = await _dataContext.Accounts.FirstAsync(x => x.Id == id);
+        //generate new salt and passwordHash
+        var salt = GenerateSalt();
+        var passwordHash = GetPasswordHash(newPassword, salt, isPasswordKeptAsHash);
+        //save changes
+        account.PasswordHash = passwordHash;
+        account.Salt = salt;
+        account.IsPasswordKeptAsHash = isPasswordKeptAsHash;
+        var result = await _dataContext.SaveChangesAsync();
+        if (result <= 0) _logger.LogError("Error saving new Password to Database");
     }
 
     public async Task<bool> IfAccountExists(string login)
@@ -87,32 +79,16 @@ public class AccountService : IAccountService
 
     public async Task<bool> CheckPassword(Guid id, string password)
     {
-        try
-        {
-            var account = await _dataContext.Accounts.FirstAsync(x => x.Id == id);
-            var hash = GetPasswordHash(password, account.Salt, account.IsPasswordKeptAsHash);
-            return hash == account.PasswordHash;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError("Account not found");
-            return false;
-        }
+        var account = await _dataContext.Accounts.FirstAsync(x => x.Id == id);
+        var hash = GetPasswordHash(password, account.Salt, account.IsPasswordKeptAsHash);
+        return hash == account.PasswordHash;
     }
 
     public async Task<bool> CheckPassword(string login, string password)
     {
-        try
-        {
-            var account = await _dataContext.Accounts.FirstAsync(x => x.Login == login);
-            var hash = GetPasswordHash(password, account.Salt, account.IsPasswordKeptAsHash);
-            return hash == account.PasswordHash;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError("Account not found");
-            return false;
-        }
+        var account = await _dataContext.Accounts.FirstAsync(x => x.Login == login);
+        var hash = GetPasswordHash(password, account.Salt, account.IsPasswordKeptAsHash);
+        return hash == account.PasswordHash;
     }
 
     private string GenerateSalt()

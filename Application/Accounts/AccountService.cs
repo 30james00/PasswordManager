@@ -2,7 +2,6 @@ using System.Security.Cryptography;
 using Domain;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using PasswordManager.Application.Accounts.DTOs;
 using PasswordManager.Application.Security.Hash;
 using PasswordManager.Application.Security.Token;
@@ -14,15 +13,12 @@ public class AccountService : IAccountService
     private readonly DataContext _dataContext;
     private readonly ITokenService _tokenService;
     private readonly IHashService _hashService;
-    private readonly ILogger<AccountService> _logger;
 
-    public AccountService(DataContext dataContext, ITokenService tokenService, IHashService hashService,
-        ILogger<AccountService> logger)
+    public AccountService(DataContext dataContext, ITokenService tokenService, IHashService hashService)
     {
         _dataContext = dataContext;
         _tokenService = tokenService;
         _hashService = hashService;
-        _logger = logger;
     }
 
     public async Task<AccountDto> CreateAccount(RegisterDto registerDto)
@@ -39,7 +35,7 @@ public class AccountService : IAccountService
 
         await _dataContext.Accounts.AddAsync(account);
         var result = await _dataContext.SaveChangesAsync();
-        if (result <= 0) _logger.LogError("Error saving new Account to Database");
+        if (result <= 0) throw new Exception("Error saving new Account to Database");
         return new AccountDto
         {
             Login = account.Login,
@@ -69,7 +65,7 @@ public class AccountService : IAccountService
         account.Salt = salt;
         account.IsPasswordKeptAsHash = isPasswordKeptAsHash;
         var result = await _dataContext.SaveChangesAsync();
-        if (result <= 0) _logger.LogError("Error saving new Password to Database");
+        if (result <= 0) throw new Exception("Error saving new MasterPassword to Database");
         return new AccountDto
         {
             Login = account.Login,

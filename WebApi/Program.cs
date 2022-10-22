@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using PasswordManager.Application;
 using PasswordManager.Application.Security.Crypto;
 using PasswordManager.Middleware;
 
@@ -77,6 +78,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("SQLite")));
 

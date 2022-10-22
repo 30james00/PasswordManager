@@ -44,7 +44,7 @@ public class AccountController : ControllerBase
     public async Task<ActionResult<AccountDto>> ChangePassword(ChangePasswordDto changePasswordDto)
     {
         var userId = _userAccessor.GetUserId();
-        if (userId == null) return Unauthorized();
+        if (userId == null) throw new KeyNotFoundException("User not logged in");
         if (!await _accountService.CheckPassword(Guid.Parse(userId), changePasswordDto.OldPassword))
             return Unauthorized();
         await _accountService.ChangePassword(Guid.Parse(userId), changePasswordDto.NewPassword,

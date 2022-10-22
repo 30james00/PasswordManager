@@ -27,16 +27,14 @@ public class AccountService : IAccountService
 
     public async Task<AccountDto> CreateAccount(RegisterDto registerDto)
     {
-        var salt = registerDto.IsPasswordKeptAsHash ? GenerateSalt() : null;
-        var passwordHash = registerDto.IsPasswordKeptAsHash
-            ? _hashService.HashWithSHA512(registerDto.Password + salt)
-            : _hashService.HashWithHMAC(registerDto.Password);
+        var salt = GenerateSalt();
+        var passwordHash = GetPasswordHash(registerDto.Password, salt, registerDto.IsPasswordKeptAsHash);
         var account = new Account
         {
             Login = registerDto.Login,
             PasswordHash = passwordHash,
             IsPasswordKeptAsHash = registerDto.IsPasswordKeptAsHash,
-            Salt = registerDto.IsPasswordKeptAsHash ? salt : null,
+            Salt = salt,
         };
 
         await _dataContext.Accounts.AddAsync(account);
@@ -67,11 +65,10 @@ public class AccountService : IAccountService
             var account = await _dataContext.Accounts.FirstAsync(x => x.Id == id);
             //generate new salt and passwordHash
             var salt = GenerateSalt();
-            var passwordHash = isPasswordKeptAsHash
-                ? _hashService.HashWithSHA512(newPassword + salt)
-                : _hashService.HashWithHMAC(newPassword);
+            var passwordHash = GetPasswordHash(newPassword, salt, isPasswordKeptAsHash);
             //save changes
             account.PasswordHash = passwordHash;
+            account.Salt = salt;
             account.IsPasswordKeptAsHash = isPasswordKeptAsHash;
             var result = await _dataContext.SaveChangesAsync();
             if (result <= 0) _logger.LogError("Error saving new Password to Database");
@@ -93,9 +90,7 @@ public class AccountService : IAccountService
         try
         {
             var account = await _dataContext.Accounts.FirstAsync(x => x.Id == id);
-            var hash = account.IsPasswordKeptAsHash
-                ? _hashService.HashWithSHA512(password + account.Salt)
-                : _hashService.HashWithHMAC(password);
+            var hash = GetPasswordHash(password, account.Salt, account.IsPasswordKeptAsHash);
             return hash == account.PasswordHash;
         }
         catch (Exception e)
@@ -110,9 +105,7 @@ public class AccountService : IAccountService
         try
         {
             var account = await _dataContext.Accounts.FirstAsync(x => x.Login == login);
-            var hash = account.IsPasswordKeptAsHash
-                ? _hashService.HashWithSHA512(password + account.Salt)
-                : _hashService.HashWithHMAC(password);
+            var hash = GetPasswordHash(password, account.Salt, account.IsPasswordKeptAsHash);
             return hash == account.PasswordHash;
         }
         catch (Exception e)
@@ -128,5 +121,12 @@ public class AccountService : IAccountService
         // cryptographically strong random bytes.
         var salt = RandomNumberGenerator.GetBytes(128 / 8); // divide by 8 to convert bits to bytes
         return Convert.ToBase64String(salt);
+    }
+
+    private string GetPasswordHash(string password, string salt, bool isPasswordKeptAsHash)
+    {
+        return isPasswordKeptAsHash
+            ? _hashService.HashWithSHA512(password + salt)
+            : _hashService.HashWithHMAC(password, salt);
     }
 }

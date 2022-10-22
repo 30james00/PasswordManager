@@ -9,7 +9,7 @@ public class HashService : IHashService
 
     public HashService(IConfiguration configuration)
     {
-        _pepper = configuration["pepper"];
+        _pepper = configuration["Pepper"];
     }
 
     public string HashWithSHA512(string text)
@@ -17,9 +17,9 @@ public class HashService : IHashService
         return CalculateSHA512(text + _pepper);
     }
 
-    public string HashWithHMAC(string text)
+    public string HashWithHMAC(string text, string key)
     {
-        return CalculateHMAC(text, _pepper);
+        return CalculateHMAC(text, key);
     }
 
     private string CalculateSHA512(string text)

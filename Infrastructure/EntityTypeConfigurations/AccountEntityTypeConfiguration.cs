@@ -10,7 +10,7 @@ namespace Infrastructure.EntityTypeConfigurations
         {
             builder.Property(x => x.Login).HasMaxLength(30).IsRequired();
             builder.Property(x => x.PasswordHash).HasMaxLength(512).IsRequired();
-            builder.Property(x => x.Salt).HasMaxLength(512);
+            builder.Property(x => x.Salt).HasMaxLength(512).IsRequired();
         }
     }
 }

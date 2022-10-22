@@ -27,7 +27,7 @@ public class AccountService : IAccountService
 
     public async Task<AccountDto> CreateAccount(RegisterDto registerDto)
     {
-        var salt = GenerateSalt();
+        var salt = registerDto.IsPasswordKeptAsHash ? GenerateSalt() : null;
         var passwordHash = registerDto.IsPasswordKeptAsHash
             ? _hashService.HashWithSHA512(registerDto.Password + salt)
             : _hashService.HashWithHMAC(registerDto.Password);
@@ -36,7 +36,7 @@ public class AccountService : IAccountService
             Login = registerDto.Login,
             PasswordHash = passwordHash,
             IsPasswordKeptAsHash = registerDto.IsPasswordKeptAsHash,
-            Salt = salt
+            Salt = registerDto.IsPasswordKeptAsHash ? salt : null,
         };
 
         await _dataContext.Accounts.AddAsync(account);

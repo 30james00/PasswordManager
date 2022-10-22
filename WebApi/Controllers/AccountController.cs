@@ -23,7 +23,7 @@ public class AccountController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult<AccountDto>> Login(LoginDto loginDto)
     {
-        if (!await _accountService.IfAccountExists(loginDto.Login)) return BadRequest("Account does not exist");
+        if (!await _accountService.IfAccountExists(loginDto.Login)) return Unauthorized();
 
         if (!await _accountService.CheckPassword(loginDto.Login, loginDto.Password)) return Unauthorized();
 
@@ -47,7 +47,8 @@ public class AccountController : ControllerBase
         if (userId == null) return Unauthorized();
         if (!await _accountService.CheckPassword(Guid.Parse(userId), changePasswordDto.OldPassword))
             return Unauthorized();
-        await _accountService.ChangePassword(changePasswordDto);
+        await _accountService.ChangePassword(Guid.Parse(userId), changePasswordDto.NewPassword,
+            changePasswordDto.IsPasswordKeptAsHash);
         return Ok();
     }
 }

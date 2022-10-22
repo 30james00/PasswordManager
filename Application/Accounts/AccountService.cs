@@ -1,7 +1,8 @@
 using System.Security.Cryptography;
 using Domain;
 using Infrastructure;
-using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using PasswordManager.Application.Accounts.DTOs;
 using PasswordManager.Application.Security.Hash;
 using PasswordManager.Application.Security.Token;
@@ -13,24 +14,23 @@ public class AccountService : IAccountService
     private readonly DataContext _dataContext;
     private readonly ITokenService _tokenService;
     private readonly IHashService _hashService;
-    private readonly IConfiguration _configuration;
+    private readonly ILogger<AccountService> _logger;
 
     public AccountService(DataContext dataContext, ITokenService tokenService, IHashService hashService,
-        IConfiguration configuration)
+        ILogger<AccountService> logger)
     {
         _dataContext = dataContext;
         _tokenService = tokenService;
         _hashService = hashService;
-        _configuration = configuration;
+        _logger = logger;
     }
 
     public async Task<AccountDto> CreateAccount(RegisterDto registerDto)
     {
         var salt = GenerateSalt();
-        var pepper = _configuration["Pepper"];
         var passwordHash = registerDto.IsPasswordKeptAsHash
-            ? _hashService.CalculateSHA512(registerDto.Password + salt + pepper)
-            : _hashService.CalculateHMAC(registerDto.Password, pepper);
+            ? _hashService.HashWithSHA512(registerDto.Password + salt)
+            : _hashService.HashWithHMAC(registerDto.Password);
         var account = new Account
         {
             Login = registerDto.Login,
@@ -49,27 +49,75 @@ public class AccountService : IAccountService
 
     public async Task<AccountDto> Login(LoginDto loginDto)
     {
-        throw new NotImplementedException();
+        var account = await _dataContext.Accounts.FirstAsync(x => x.Login == loginDto.Login);
+        return new AccountDto
+        {
+            Login = loginDto.Login,
+            Token = _tokenService.CreateToken(account),
+        };
     }
 
-    public async Task ChangePassword(ChangePasswordDto changePasswordDto)
+    public async Task ChangePassword(Guid id, string newPassword, bool isPasswordKeptAsHash)
     {
-        throw new NotImplementedException();
+        try
+        {
+            //get Account
+            var account = await _dataContext.Accounts.FirstAsync(x => x.Id == id);
+            //generate new salt and passwordHash
+            var salt = GenerateSalt();
+            var passwordHash = isPasswordKeptAsHash
+                ? _hashService.HashWithSHA512(newPassword + salt)
+                : _hashService.HashWithHMAC(newPassword);
+            //save changes
+            account.PasswordHash = passwordHash;
+            account.IsPasswordKeptAsHash = isPasswordKeptAsHash;
+            var result = await _dataContext.SaveChangesAsync();
+            if (result <= 0) _logger.LogError("Error saving new Password to Database");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Account not found");
+            Console.WriteLine(e);
+        }
     }
 
     public async Task<bool> IfAccountExists(string login)
     {
-        throw new NotImplementedException();
+        return await _dataContext.Accounts.AnyAsync(x => x.Login == login);
     }
 
     public async Task<bool> CheckPassword(Guid id, string password)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var account = await _dataContext.Accounts.FirstAsync(x => x.Id == id);
+            var hash = account.IsPasswordKeptAsHash
+                ? _hashService.HashWithSHA512(password + account.Salt)
+                : _hashService.HashWithHMAC(password);
+            return hash == account.PasswordHash;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Account not found");
+            return false;
+        }
     }
 
     public async Task<bool> CheckPassword(string login, string password)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var account = await _dataContext.Accounts.FirstAsync(x => x.Login == login);
+            var hash = account.IsPasswordKeptAsHash
+                ? _hashService.HashWithSHA512(password + account.Salt)
+                : _hashService.HashWithHMAC(password);
+            return hash == account.PasswordHash;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Account not found");
+            return false;
+        }
     }
 
     private string GenerateSalt()

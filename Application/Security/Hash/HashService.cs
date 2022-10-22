@@ -1,10 +1,28 @@
 using System.Security.Cryptography;
+using Microsoft.Extensions.Configuration;
 
 namespace PasswordManager.Application.Security.Hash;
 
 public class HashService : IHashService
 {
-    public string CalculateSHA512(string text)
+    private readonly string _pepper;
+
+    public HashService(IConfiguration configuration)
+    {
+        _pepper = configuration["pepper"];
+    }
+
+    public string HashWithSHA512(string text)
+    {
+        return CalculateSHA512(text + _pepper);
+    }
+
+    public string HashWithHMAC(string text)
+    {
+        return CalculateHMAC(text, _pepper);
+    }
+
+    private string CalculateSHA512(string text)
     {
         //split string into bytes
         var bytes = System.Text.Encoding.UTF8.GetBytes(text);
@@ -16,7 +34,7 @@ public class HashService : IHashService
         return hashValue.Aggregate("", (current, hashByte) => current + $"{hashByte:x2}");
     }
 
-    public string CalculateHMAC(string text, string key)
+    private string CalculateHMAC(string text, string key)
     {
         var textBytes = System.Text.Encoding.UTF8.GetBytes(text);
         var keyBytes = System.Text.Encoding.UTF8.GetBytes(key);

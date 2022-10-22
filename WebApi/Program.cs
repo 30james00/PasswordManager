@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using PasswordManager.Application.Security.Crypto;
 using PasswordManager.Middleware;
 
 var clientOrigin = "_clientOrigin";
@@ -62,8 +63,9 @@ builder.Services.AddSwaggerGen(c =>
 // Add services to the container.
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IHashService, HashService>();
+builder.Services.AddTransient<ICryptoService, CryptoService>();
 builder.Services.AddTransient<IAccountService, AccountService>();
-builder.Services.AddTransient<IUserAccessor, UserAccessor>();
+builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 
 builder.Services.AddControllers(opt =>
 {

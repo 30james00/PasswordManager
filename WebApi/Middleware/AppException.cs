@@ -1,8 +1,8 @@
-namespace Application.Core
+namespace PasswordManager.Middleware
 {
     public class AppException
     {
-        public AppException(int statusCode, string message, string details = null)
+        public AppException(int statusCode, string message, string details = null!)
         {
             StatusCode = statusCode;
             Message = message;

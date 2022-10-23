@@ -12,6 +12,10 @@ namespace PasswordManager.Application.Security.Token
             _httpContextAccessor = httpContextAccessor;
         }
         
+        /// <summary>
+        /// Allows to read user id info from HTTP request
+        /// </summary>
+        /// <returns>Account Id string</returns>
         public string? GetUserId()
         {
             return _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);

@@ -37,8 +37,10 @@ public class SavedPasswordService : ISavedPasswordService
 
     public async Task<List<SavedPasswordDto>> ListPassword()
     {
+        // Get Account
         var accountId = _userAccessor.GetUserId();
         if (accountId == null) throw new KeyNotFoundException("User not logged in");
+        
         return await _dataContext.SavedPasswords.Where(x => x.AccountId == Guid.Parse(accountId))
             .ProjectTo<SavedPasswordDto>(_mapper.ConfigurationProvider).ToListAsync();
     }
@@ -49,34 +51,22 @@ public class SavedPasswordService : ISavedPasswordService
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task<string> DecryptPassword(Guid id)
-    {
-        var accountId = _userAccessor.GetUserId();
-        if (accountId == null) throw new KeyNotFoundException("User not logged in");
-        var account = await _dataContext.Accounts.FirstOrDefaultAsync(x => x.Id == Guid.Parse(accountId));
-        if (account == null) throw new KeyNotFoundException("User not logged in");
-
-        var savedPassword = await _dataContext.SavedPasswords.FirstOrDefaultAsync(x => x.Id == id);
-        if (savedPassword == null) throw new KeyNotFoundException("SavedPassword not found");
-        var masterPasswordBytes = GetMasterPasswordBytes(account.PasswordHash);
-
-        var ivBytes = Convert.FromBase64String(savedPassword.Iv);
-        return _cryptoService.Decrypt(savedPassword.Password, masterPasswordBytes, ivBytes);
-    }
-
     public async Task<SavedPasswordDto> CreatePassword(CreatePasswordDto passwordDto)
     {
+        // Get Account
         var accountId = _userAccessor.GetUserId();
         if (accountId == null) throw new KeyNotFoundException("User not logged in");
-        var account = await _dataContext.Accounts.FirstOrDefaultAsync(x => x.Id == Guid.Parse(accountId));
-        if (account == null) throw new KeyNotFoundException("User not logged in");
+        var account = await _dataContext.Accounts.FirstAsync(x => x.Id == Guid.Parse(accountId));
 
-        var masterPasswordBytes = GetMasterPasswordBytes(account.PasswordHash);
+        //Create key for password encryption using MasterPassword hash
+        var key = CreateMasterPasswordKey(account.PasswordHash);
+        // Create IV for AES
         using var aes = Aes.Create();
         var ivBytes = aes.IV;
         var savedPassword = new SavedPassword
         {
-            Password = _cryptoService.Encrypt(passwordDto.Password, masterPasswordBytes, ivBytes),
+            // Encrypt password
+            Password = _cryptoService.Encrypt(passwordDto.Password, key, ivBytes),
             WebAddress = passwordDto.WebAddress,
             Description = passwordDto.Description,
             Login = passwordDto.Login,
@@ -92,19 +82,22 @@ public class SavedPasswordService : ISavedPasswordService
 
     public async Task<SavedPasswordDto> EditPassword(EditPasswordDto passwordDto)
     {
-        var savedPassword = await _dataContext.SavedPasswords.FirstOrDefaultAsync(x => x.Id == passwordDto.Id);
-        if (savedPassword == null) throw new KeyNotFoundException("SavedPassword not found");
-
+        // Get Account
         var accountId = _userAccessor.GetUserId();
         if (accountId == null) throw new KeyNotFoundException("User not logged in");
-        var account = await _dataContext.Accounts.FirstOrDefaultAsync(x => x.Id == Guid.Parse(accountId));
-        if (account == null) throw new KeyNotFoundException("User not logged in");
+        var account = await _dataContext.Accounts.FirstAsync(x => x.Id == Guid.Parse(accountId));
 
-        var masterPasswordBytes = GetMasterPasswordBytes(account.PasswordHash);
+        // Get SavedPassword
+        var savedPassword = await _dataContext.SavedPasswords.FirstAsync(x => x.Id == passwordDto.Id);
+        
+        // Create key for password encryption using MasterPassword hash
+        var key = CreateMasterPasswordKey(account.PasswordHash);
+        // Create IV for AES
         using var aes = Aes.Create();
         var ivBytes = aes.IV;
 
-        savedPassword.Password = _cryptoService.Encrypt(passwordDto.Password, masterPasswordBytes, ivBytes);
+        // Edit entity fields
+        savedPassword.Password = _cryptoService.Encrypt(passwordDto.Password, key, ivBytes);
         savedPassword.WebAddress = passwordDto.WebAddress;
         savedPassword.Description = passwordDto.Description;
         savedPassword.Login = passwordDto.Login;
@@ -117,15 +110,36 @@ public class SavedPasswordService : ISavedPasswordService
 
     public async Task DeletePassword(Guid id)
     {
-        var savedPassword = await _dataContext.SavedPasswords.FirstOrDefaultAsync(x => x.Id == id);
-        if (savedPassword == null) throw new KeyNotFoundException("SavedPassword not found");
+        // Get SavedPassword
+        var savedPassword = await _dataContext.SavedPasswords.FirstAsync(x => x.Id == id);
 
         _dataContext.SavedPasswords.Remove(savedPassword);
         var result = await _dataContext.SaveChangesAsync();
         if (result <= 0) throw new Exception("Error saving new Password to Database");
     }
+    
+    public async Task<string> DecryptPassword(Guid id)
+    {
+        // Get Account
+        var accountId = _userAccessor.GetUserId();
+        if (accountId == null) throw new KeyNotFoundException("User not logged in");
+        var account = await _dataContext.Accounts.FirstAsync(x => x.Id == Guid.Parse(accountId));
+        // Get SavedPassword
+        var savedPassword = await _dataContext.SavedPasswords.FirstAsync(x => x.Id == id);
+        if (savedPassword == null) throw new KeyNotFoundException("SavedPassword not found");
+        var key = CreateMasterPasswordKey(account.PasswordHash);
 
-    private byte[] GetMasterPasswordBytes(string password)
+        //Get IV
+        var ivBytes = Convert.FromBase64String(savedPassword.Iv);
+        return _cryptoService.Decrypt(savedPassword.Password, key, ivBytes);
+    }
+
+    /// <summary>
+    /// Creates Key for Encryption using MD-5 hash of MasterPassword and pepper HMAC value
+    /// </summary>
+    /// <param name="password">MasterPassword</param>
+    /// <returns>128-bit key</returns>
+    private byte[] CreateMasterPasswordKey(string password)
     {
         return Convert.FromBase64String(
             _hashService.HashWithMD5(_hashService.HashWithHMAC(password, _configuration["Pepper"])));

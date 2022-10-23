@@ -34,6 +34,7 @@ public class AccountService : IAccountService
 
     public async Task<AccountDto> CreateAccount(RegisterDto registerDto)
     {
+        // Generate new salt and hash
         var salt = GenerateSalt();
         var passwordHash = GetPasswordHash(registerDto.Password, salt, registerDto.IsPasswordKeptAsHash);
         var account = new Account
@@ -60,30 +61,32 @@ public class AccountService : IAccountService
         return new AccountDto
         {
             Login = loginDto.Login,
+            // Create JWT token
             Token = _tokenService.CreateToken(account),
         };
     }
 
     public async Task<AccountDto> ChangePassword(Guid id, string newPassword, bool isPasswordKeptAsHash)
     {
-        //get Account
+        // Get Account from database
         var account = await _dataContext.Accounts.FirstAsync(x => x.Id == id);
-        //generate new salt and passwordHash
+        // Generate new salt and hash
         var salt = GenerateSalt();
         var passwordHash = GetPasswordHash(newPassword, salt, isPasswordKeptAsHash);
 
-        //decrypt passwords
+        // Decrypt passwords encrypted with old MasterPassword
         var savedPasswords = await _dataContext.SavedPasswords.Where(x => x.AccountId == account.Id).ToListAsync();
         foreach (var savedPassword in savedPasswords)
         {
             savedPassword.Password = await _savedPasswordService.DecryptPassword(savedPassword.Id);
         }
 
-        //save changes
+        // Save new MasterPassword and salt
         account.PasswordHash = passwordHash;
         account.Salt = salt;
         account.IsPasswordKeptAsHash = isPasswordKeptAsHash;
 
+        // Encrypt passwords with new MasterPassword
         foreach (var savedPassword in savedPasswords)
         {
             var masterPasswordBytes = GetMasterPasswordBytes(passwordHash);

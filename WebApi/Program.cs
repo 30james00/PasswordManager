@@ -31,12 +31,29 @@ builder.Services.AddCors(options =>
         });
 });
 
+// Add services to the container.
+builder.Services.AddTransient<IAccountService, AccountService>();
+builder.Services.AddTransient<ISavedPasswordService, SavedPasswordService>();
+
+builder.Services.AddTransient<ITokenService, TokenService>();
+builder.Services.AddTransient<IHashService, HashService>();
+builder.Services.AddTransient<ICryptoService, CryptoService>();
+
+builder.Services.AddScoped<IUserAccessor, UserAccessor>();
+
+builder.Services.AddControllers(opt =>
+{
+    // Add authorization to controllers
+    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+    opt.Filters.Add(new AuthorizeFilter(policy));
+});
+
 // Add Swagger specification
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Greengrocers",
+        Title = "PasswordManager",
         Version = "v1"
     });
 
@@ -61,31 +78,20 @@ builder.Services.AddSwaggerGen(c =>
         { securityScheme, Array.Empty<string>() }
     });
 });
-
-// Add services to the container.
-builder.Services.AddTransient<ITokenService, TokenService>();
-builder.Services.AddTransient<IHashService, HashService>();
-builder.Services.AddTransient<ICryptoService, CryptoService>();
-builder.Services.AddTransient<IAccountService, AccountService>();
-builder.Services.AddTransient<ISavedPasswordService, SavedPasswordService>();
-builder.Services.AddScoped<IUserAccessor, UserAccessor>();
-
-builder.Services.AddControllers(opt =>
-{
-    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-    opt.Filters.Add(new AuthorizeFilter(policy));
-});
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+
 builder.Services.AddDbContext<DataContext>(options =>
+    // Configure SQLite database
     options.UseSqlite(builder.Configuration.GetConnectionString("SQLite")));
 
 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenKey"]));
 
+//Configure Authentication and add Authorization
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(opt =>
     {
@@ -99,7 +105,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.Zero,
         };
     });
-
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -113,6 +118,7 @@ using (var scope = app.Services.CreateScope())
     await context.Database.MigrateAsync();
 }
 
+// Activate CORS
 app.UseCors(clientOrigin);
 
 // Configure the HTTP request pipeline.

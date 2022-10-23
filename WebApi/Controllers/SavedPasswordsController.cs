@@ -8,12 +8,12 @@ namespace PasswordManager.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PasswordsController : ControllerBase
+public class SavedPasswordsController : ControllerBase
 {
     private readonly ISavedPasswordService _savedPasswordService;
     private readonly IUserAccessor _userAccessor;
 
-    public PasswordsController(ISavedPasswordService savedPasswordService, IUserAccessor userAccessor)
+    public SavedPasswordsController(ISavedPasswordService savedPasswordService, IUserAccessor userAccessor)
     {
         _savedPasswordService = savedPasswordService;
         _userAccessor = userAccessor;

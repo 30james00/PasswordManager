@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using PasswordManager.Application;
+using PasswordManager.Application.SavedPasswords;
 using PasswordManager.Application.Security.Crypto;
 using PasswordManager.Middleware;
 
@@ -66,6 +67,7 @@ builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IHashService, HashService>();
 builder.Services.AddTransient<ICryptoService, CryptoService>();
 builder.Services.AddTransient<IAccountService, AccountService>();
+builder.Services.AddTransient<ISavedPasswordService, SavedPasswordService>();
 builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 
 builder.Services.AddControllers(opt =>

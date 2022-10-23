@@ -56,9 +56,8 @@ public class SavedPasswordService : ISavedPasswordService
 
         var savedPassword = await _dataContext.SavedPasswords.FirstOrDefaultAsync(x => x.Id == id);
         if (savedPassword == null) throw new KeyNotFoundException("SavedPassword not found");
-        var masterPasswordBytes =
-            System.Text.Encoding.UTF8.GetBytes(
-                _hashService.HashWithHMAC(account.PasswordHash, _configuration["Pepper"]));
+        var masterPasswordBytes = GetMasterPasswordBytes(account.PasswordHash);
+
         var ivBytes = System.Text.Encoding.UTF8.GetBytes(savedPassword.Iv);
         return _cryptoService.Decrypt(savedPassword.Password, masterPasswordBytes, ivBytes);
     }
@@ -70,8 +69,7 @@ public class SavedPasswordService : ISavedPasswordService
         var account = await _dataContext.Accounts.FirstOrDefaultAsync(x => x.Id == Guid.Parse(accountId));
         if (account == null) throw new KeyNotFoundException("User not logged in");
 
-        var masterPasswordBytes = System.Text.Encoding.UTF8.GetBytes(
-            _hashService.HashWithHMAC(account.PasswordHash, _configuration["Pepper"]));
+        var masterPasswordBytes = GetMasterPasswordBytes(passwordDto.Password);
         using var aes = Aes.Create();
         var ivBytes = aes.IV;
         var savedPassword = new SavedPassword
@@ -99,8 +97,7 @@ public class SavedPasswordService : ISavedPasswordService
         var account = await _dataContext.Accounts.FirstOrDefaultAsync(x => x.Id == Guid.Parse(accountId));
         if (account == null) throw new KeyNotFoundException("User not logged in");
 
-        var masterPasswordBytes = System.Text.Encoding.UTF8.GetBytes(
-            _hashService.HashWithHMAC(account.PasswordHash, _configuration["Pepper"]));
+        var masterPasswordBytes = GetMasterPasswordBytes(passwordDto.Password);
         using var aes = Aes.Create();
         var ivBytes = aes.IV;
 
@@ -123,5 +120,11 @@ public class SavedPasswordService : ISavedPasswordService
         _dataContext.SavedPasswords.Remove(savedPassword);
         var result = await _dataContext.SaveChangesAsync();
         if (result <= 0) throw new Exception("Error saving new Password to Database");
+    }
+
+    private byte[] GetMasterPasswordBytes(string password)
+    {
+        return System.Text.Encoding.UTF8.GetBytes(
+            _hashService.HashWithMD5(_hashService.HashWithHMAC(password, _configuration["Pepper"])));
     }
 }

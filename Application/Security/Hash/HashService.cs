@@ -22,6 +22,15 @@ public class HashService : IHashService
         return CalculateHMAC(text, key);
     }
 
+    public string HashWithMD5(string text)
+    {
+        using var md5 = MD5.Create();
+        byte[] bytes = System.Text.Encoding.ASCII.GetBytes(text);
+        byte[] hashValue = md5.ComputeHash(bytes);
+
+        return hashValue.Aggregate("", (current, hashByte) => current + $"{hashByte:x2}");
+    }
+
     private string CalculateSHA512(string text)
     {
         //split string into bytes

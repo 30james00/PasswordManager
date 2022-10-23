@@ -2,7 +2,11 @@ using System.Security.Cryptography;
 using Domain;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using PasswordManager.Application.Accounts.DTOs;
+using PasswordManager.Application.SavedPasswords;
+using PasswordManager.Application.SavedPasswords.DTOs;
+using PasswordManager.Application.Security.Crypto;
 using PasswordManager.Application.Security.Hash;
 using PasswordManager.Application.Security.Token;
 
@@ -13,12 +17,19 @@ public class AccountService : IAccountService
     private readonly DataContext _dataContext;
     private readonly ITokenService _tokenService;
     private readonly IHashService _hashService;
+    private readonly IConfiguration _configuration;
+    private readonly ICryptoService _cryptoService;
+    private readonly ISavedPasswordService _savedPasswordService;
 
-    public AccountService(DataContext dataContext, ITokenService tokenService, IHashService hashService)
+    public AccountService(DataContext dataContext, ITokenService tokenService, IHashService hashService,
+        IConfiguration configuration, ICryptoService cryptoService, ISavedPasswordService savedPasswordService)
     {
         _dataContext = dataContext;
         _tokenService = tokenService;
         _hashService = hashService;
+        _configuration = configuration;
+        _cryptoService = cryptoService;
+        _savedPasswordService = savedPasswordService;
     }
 
     public async Task<AccountDto> CreateAccount(RegisterDto registerDto)
@@ -60,10 +71,28 @@ public class AccountService : IAccountService
         //generate new salt and passwordHash
         var salt = GenerateSalt();
         var passwordHash = GetPasswordHash(newPassword, salt, isPasswordKeptAsHash);
+
+        //decrypt passwords
+        var savedPasswords = await _dataContext.SavedPasswords.Where(x => x.AccountId == account.Id).ToListAsync();
+        foreach (var savedPassword in savedPasswords)
+        {
+            savedPassword.Password = await _savedPasswordService.DecryptPassword(savedPassword.Id);
+        }
+
         //save changes
         account.PasswordHash = passwordHash;
         account.Salt = salt;
         account.IsPasswordKeptAsHash = isPasswordKeptAsHash;
+
+        foreach (var savedPassword in savedPasswords)
+        {
+            var masterPasswordBytes = GetMasterPasswordBytes(passwordHash);
+            using var aes = Aes.Create();
+            var ivBytes = aes.IV;
+            savedPassword.Password = _cryptoService.Encrypt(savedPassword.Password, masterPasswordBytes, ivBytes);
+            savedPassword.Iv = Convert.ToBase64String(ivBytes);
+        }
+
         var result = await _dataContext.SaveChangesAsync();
         if (result <= 0) throw new Exception("Error saving new MasterPassword to Database");
         return new AccountDto
@@ -105,5 +134,11 @@ public class AccountService : IAccountService
         return isPasswordKeptAsHash
             ? _hashService.HashWithSHA512(password + salt)
             : _hashService.HashWithHMAC(password, salt);
+    }
+
+    private byte[] GetMasterPasswordBytes(string password)
+    {
+        return Convert.FromBase64String(
+            _hashService.HashWithMD5(_hashService.HashWithHMAC(password, _configuration["Pepper"])));
     }
 }

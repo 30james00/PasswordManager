@@ -4,6 +4,7 @@ using Domain;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using PasswordManager.Application.SavedPasswords.DTOs;
 using PasswordManager.Application.Security.Crypto;
 using PasswordManager.Application.Security.Hash;
@@ -20,10 +21,10 @@ public class SavedPasswordService : ISavedPasswordService
     private readonly IUserAccessor _userAccessor;
     private readonly IConfiguration _configuration;
     private readonly IMapper _mapper;
+    private readonly ILogger<SavedPasswordService> _logger;
 
     public SavedPasswordService(DataContext dataContext, ICryptoService cryptoService, IHashService hashService,
-        IUserAccessor userAccessor,
-        IConfiguration configuration, IMapper mapper)
+        IUserAccessor userAccessor, IConfiguration configuration, IMapper mapper, ILogger<SavedPasswordService> logger)
     {
         _dataContext = dataContext;
         _cryptoService = cryptoService;
@@ -31,6 +32,7 @@ public class SavedPasswordService : ISavedPasswordService
         _userAccessor = userAccessor;
         _configuration = configuration;
         _mapper = mapper;
+        _logger = logger;
     }
 
     public async Task<List<SavedPasswordDto>> ListPassword()
@@ -58,7 +60,7 @@ public class SavedPasswordService : ISavedPasswordService
         if (savedPassword == null) throw new KeyNotFoundException("SavedPassword not found");
         var masterPasswordBytes = GetMasterPasswordBytes(account.PasswordHash);
 
-        var ivBytes = System.Text.Encoding.UTF8.GetBytes(savedPassword.Iv);
+        var ivBytes = Convert.FromBase64String(savedPassword.Iv);
         return _cryptoService.Decrypt(savedPassword.Password, masterPasswordBytes, ivBytes);
     }
 
@@ -69,18 +71,19 @@ public class SavedPasswordService : ISavedPasswordService
         var account = await _dataContext.Accounts.FirstOrDefaultAsync(x => x.Id == Guid.Parse(accountId));
         if (account == null) throw new KeyNotFoundException("User not logged in");
 
-        var masterPasswordBytes = GetMasterPasswordBytes(passwordDto.Password);
+        var masterPasswordBytes = GetMasterPasswordBytes(account.PasswordHash);
         using var aes = Aes.Create();
         var ivBytes = aes.IV;
         var savedPassword = new SavedPassword
         {
-            AccountId = Guid.Parse(accountId),
             Password = _cryptoService.Encrypt(passwordDto.Password, masterPasswordBytes, ivBytes),
             WebAddress = passwordDto.WebAddress,
             Description = passwordDto.Description,
             Login = passwordDto.Login,
-            Iv = ivBytes.Aggregate("", (current, hashByte) => current + $"{hashByte:x2}"),
+            Iv = Convert.ToBase64String(ivBytes),
+            AccountId = Guid.Parse(accountId),
         };
+
         await _dataContext.SavedPasswords.AddAsync(savedPassword);
         var result = await _dataContext.SaveChangesAsync();
         if (result <= 0) throw new Exception("Error saving new Password to Database");
@@ -97,7 +100,7 @@ public class SavedPasswordService : ISavedPasswordService
         var account = await _dataContext.Accounts.FirstOrDefaultAsync(x => x.Id == Guid.Parse(accountId));
         if (account == null) throw new KeyNotFoundException("User not logged in");
 
-        var masterPasswordBytes = GetMasterPasswordBytes(passwordDto.Password);
+        var masterPasswordBytes = GetMasterPasswordBytes(account.PasswordHash);
         using var aes = Aes.Create();
         var ivBytes = aes.IV;
 
@@ -105,7 +108,7 @@ public class SavedPasswordService : ISavedPasswordService
         savedPassword.WebAddress = passwordDto.WebAddress;
         savedPassword.Description = passwordDto.Description;
         savedPassword.Login = passwordDto.Login;
-        savedPassword.Iv = ivBytes.Aggregate("", (current, hashByte) => current + $"{hashByte:x2}");
+        savedPassword.Iv = Convert.ToBase64String(ivBytes);
 
         var result = await _dataContext.SaveChangesAsync();
         if (result <= 0) throw new Exception("Error saving new Password to Database");
@@ -124,7 +127,7 @@ public class SavedPasswordService : ISavedPasswordService
 
     private byte[] GetMasterPasswordBytes(string password)
     {
-        return System.Text.Encoding.UTF8.GetBytes(
+        return Convert.FromBase64String(
             _hashService.HashWithMD5(_hashService.HashWithHMAC(password, _configuration["Pepper"])));
     }
 }

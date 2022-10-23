@@ -25,10 +25,10 @@ public class HashService : IHashService
     public string HashWithMD5(string text)
     {
         using var md5 = MD5.Create();
-        byte[] bytes = System.Text.Encoding.ASCII.GetBytes(text);
+        byte[] bytes = System.Text.Encoding.UTF8.GetBytes(text);
         byte[] hashValue = md5.ComputeHash(bytes);
 
-        return hashValue.Aggregate("", (current, hashByte) => current + $"{hashByte:x2}");
+        return Convert.ToBase64String(hashValue);
     }
 
     private string CalculateSHA512(string text)
@@ -40,7 +40,7 @@ public class HashService : IHashService
         var hashValue = sha512.ComputeHash(bytes);
 
         //join separate bytes into string
-        return hashValue.Aggregate("", (current, hashByte) => current + $"{hashByte:x2}");
+        return Convert.ToBase64String(hashValue);
     }
 
     private string CalculateHMAC(string text, string key)
@@ -50,6 +50,6 @@ public class HashService : IHashService
 
         using var hmacSha512 = new HMACSHA512(keyBytes);
         var hashValue = hmacSha512.ComputeHash(textBytes);
-        return hashValue.Aggregate("", (current, hashByte) => current + $"{hashByte:x2}");
+        return Convert.ToBase64String(hashValue);
     }
 }

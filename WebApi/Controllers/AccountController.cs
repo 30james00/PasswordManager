@@ -6,48 +6,26 @@ using PasswordManager.Application.Security.Token;
 
 namespace PasswordManager.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class AccountController : ControllerBase
+public class AccountController : BaseApiController
 {
-    private readonly IAccountService _accountService;
-    private readonly IUserAccessor _userAccessor;
-
-    public AccountController(IAccountService accountService, IUserAccessor userAccessor)
-    {
-        _accountService = accountService;
-        _userAccessor = userAccessor;
-    }
-
     [AllowAnonymous]
     [HttpPost("login")]
-    public async Task<ActionResult<AccountDto>> Login(LoginDto loginDto)
+    public async Task<ActionResult<AccountDto>> Login(LoginQuery loginQuery)
     {
-        if (!await _accountService.IfAccountExists(loginDto.Login)) return Unauthorized();
-
-        if (!await _accountService.CheckPassword(loginDto.Login, loginDto.Password)) return Unauthorized();
-
-        return await _accountService.Login(loginDto);
+        return HandleResult(await Mediator.Send(loginQuery));
     }
 
     [AllowAnonymous]
     [HttpPost("register")]
-    public async Task<ActionResult<AccountDto>> Register(RegisterDto registerDto)
+    public async Task<ActionResult<AccountDto>> Register(CreateAccountCommand createAccountCommand)
     {
-        if (await _accountService.IfAccountExists(registerDto.Login)) return BadRequest("Login already used");
-
-        return await _accountService.CreateAccount(registerDto);
+        return HandleResult(await Mediator.Send(createAccountCommand));
     }
 
     [Authorize]
     [HttpPatch("change-password")]
-    public async Task<ActionResult<AccountDto>> ChangePassword(ChangePasswordDto changePasswordDto)
+    public async Task<ActionResult<AccountDto>> ChangePassword(ChangePasswordCommand changePasswordCommand)
     {
-        var userId = _userAccessor.GetUserId();
-        if (userId == null) throw new KeyNotFoundException("User not logged in");
-        if (!await _accountService.CheckPassword(Guid.Parse(userId), changePasswordDto.OldPassword))
-            return Unauthorized();
-        return await _accountService.ChangePassword(Guid.Parse(userId), changePasswordDto.NewPassword,
-            changePasswordDto.IsPasswordKeptAsHash);
+        return HandleResult(await Mediator.Send(changePasswordCommand));
     }
 }

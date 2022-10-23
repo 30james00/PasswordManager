@@ -6,9 +6,7 @@ using PasswordManager.Application.Security.Token;
 
 namespace PasswordManager.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class SavedPasswordsController : ControllerBase
+public class SavedPasswordsController : BaseApiController
 {
     private readonly ISavedPasswordService _savedPasswordService;
     private readonly IUserAccessor _userAccessor;

@@ -1,15 +1,17 @@
 using System.Text;
+using Application;
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Application.Security.Hash;
 using PasswordManager.Application.Security.Token;
 using Infrastructure;
+using MediatR;
 using Microsoft.OpenApi.Models;
 using PasswordManager.Application.Accounts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.IdentityModel.Tokens;
-using PasswordManager.Application;
+using PasswordManager.Application.Core;
 using PasswordManager.Application.SavedPasswords;
 using PasswordManager.Application.Security.Crypto;
 using PasswordManager.Middleware;
@@ -84,6 +86,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+builder.Services.AddMediatR(typeof(MediatREntrypoint).Assembly);
 
 builder.Services.AddDbContext<DataContext>(options =>
     // Configure SQLite database

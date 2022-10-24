@@ -7,5 +7,5 @@ public interface IAccountService
     public string GenerateSalt();
     public string GetPasswordHash(string password, string salt, bool isPasswordKeptAsHash);
 
-    public byte[] GetMasterPasswordBytes(string password);
+    public byte[] GetMasterPasswordKey(string password);
 }

@@ -2,72 +2,43 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.SavedPasswords;
 using PasswordManager.Application.SavedPasswords.DTOs;
-using PasswordManager.Application.Security.Token;
 
 namespace PasswordManager.Controllers;
 
 public class SavedPasswordsController : BaseApiController
 {
-    private readonly ISavedPasswordService _savedPasswordService;
-    private readonly IUserAccessor _userAccessor;
-
-    public SavedPasswordsController(ISavedPasswordService savedPasswordService, IUserAccessor userAccessor)
-    {
-        _savedPasswordService = savedPasswordService;
-        _userAccessor = userAccessor;
-    }
-
     [Authorize]
     [HttpGet]
     public async Task<ActionResult<List<SavedPasswordDto>>> ListPasswords()
     {
-        return await _savedPasswordService.ListPassword();
+        return HandleResult(await Mediator.Send(new ListPasswordQuery()));
     }
 
     [Authorize]
     [HttpPost]
-    public async Task<ActionResult<SavedPasswordDto>> CreatePassword(CreatePasswordDto passwordDto)
+    public async Task<ActionResult<SavedPasswordDto>> CreatePassword(CreatePasswordCommand command)
     {
-        return await _savedPasswordService.CreatePassword(passwordDto);
+        return HandleResult(await Mediator.Send(command));
     }
 
     [Authorize]
     [HttpPatch]
-    public async Task<ActionResult<SavedPasswordDto>> EditPassword(EditPasswordDto passwordDto)
+    public async Task<ActionResult<SavedPasswordDto>> EditPassword(EditPasswordCommand command)
     {
-        var password = await _savedPasswordService.DetailPassword(passwordDto.Id);
-        var accountId = _userAccessor.GetUserId();
-        if (password == null) return NotFound();
-        if (accountId == null) throw new KeyNotFoundException("Account not found");
-        if (password.AccountId != Guid.Parse(accountId)) return Unauthorized();
-
-        return await _savedPasswordService.EditPassword(passwordDto);
+        return HandleResult(await Mediator.Send(command));
     }
 
     [Authorize]
     [HttpDelete("{id:guid}")]
-    public async Task<ActionResult> DeletePassword(Guid id)
+    public async Task<ActionResult> DeletePassword(DeletePasswordCommand command)
     {
-        var password = await _savedPasswordService.DetailPassword(id);
-        var accountId = _userAccessor.GetUserId();
-        if (password == null) return NotFound();
-        if (accountId == null) throw new KeyNotFoundException("Account not found");
-        if (password.AccountId != Guid.Parse(accountId)) return Unauthorized();
-
-        await _savedPasswordService.DeletePassword(id);
-        return Ok();
+        return HandleResult(await Mediator.Send(command));
     }
 
     [Authorize]
     [HttpGet("decrypt/{id:guid}")]
     public async Task<ActionResult<string>> DecryptPassword(Guid id)
     {
-        var password = await _savedPasswordService.DetailPassword(id);
-        var accountId = _userAccessor.GetUserId();
-        if (password == null) return NotFound();
-        if (accountId == null) throw new KeyNotFoundException("Account not found");
-        if (password.AccountId != Guid.Parse(accountId)) return Unauthorized();
-
-        return await _savedPasswordService.DecryptPassword(id);
+        return HandleResult(await Mediator.Send(new DecryptPasswordQuery(id)));
     }
 }

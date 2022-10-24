@@ -35,7 +35,6 @@ builder.Services.AddCors(options =>
 
 // Add services to the container.
 builder.Services.AddTransient<IAccountService, AccountService>();
-builder.Services.AddTransient<ISavedPasswordService, SavedPasswordService>();
 
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IHashService, HashService>();

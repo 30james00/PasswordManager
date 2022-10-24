@@ -5,7 +5,6 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Application.Accounts.DTOs;
 using PasswordManager.Application.Core;
-using PasswordManager.Application.SavedPasswords;
 using PasswordManager.Application.Security.Crypto;
 using PasswordManager.Application.Security.Token;
 
@@ -29,18 +28,16 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
     private readonly DataContext _dataContext;
     private readonly IUserAccessor _userAccessor;
     private readonly IAccountService _accountService;
-    private readonly ISavedPasswordService _savedPasswordService;
     private readonly ICryptoService _cryptoService;
     private readonly ITokenService _tokenService;
 
     public ChangePasswordCommandHandler(DataContext dataContext, IUserAccessor userAccessor,
-        IAccountService accountService, ISavedPasswordService savedPasswordService, ICryptoService cryptoService,
+        IAccountService accountService, ICryptoService cryptoService,
         ITokenService tokenService)
     {
         _dataContext = dataContext;
         _userAccessor = userAccessor;
         _accountService = accountService;
-        _savedPasswordService = savedPasswordService;
         _cryptoService = cryptoService;
         _tokenService = tokenService;
     }
@@ -60,10 +57,13 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
         var passwordHash = _accountService.GetPasswordHash(request.NewPassword, salt, request.IsPasswordKeptAsHash);
 
         // Decrypt passwords encrypted with old MasterPassword
-        var savedPasswords = await _dataContext.SavedPasswords.Where(x => x.AccountId == account.Id).ToListAsync();
+        var savedPasswords = await _dataContext.SavedPasswords.Where(x => x.AccountId == account.Id)
+            .ToListAsync(cancellationToken);
+        var key = _accountService.GetMasterPasswordKey(account.PasswordHash);
         foreach (var savedPassword in savedPasswords)
         {
-            savedPassword.Password = await _savedPasswordService.DecryptPassword(savedPassword.Id);
+            var ivBytes = Convert.FromBase64String(savedPassword.Iv);
+            savedPassword.Password = _cryptoService.Decrypt(savedPassword.Password, key, ivBytes);
         }
 
         // Save new MasterPassword and salt
@@ -74,7 +74,7 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
         // Encrypt passwords with new MasterPassword
         foreach (var savedPassword in savedPasswords)
         {
-            var masterPasswordBytes = _accountService.GetMasterPasswordBytes(passwordHash);
+            var masterPasswordBytes = _accountService.GetMasterPasswordKey(passwordHash);
             using var aes = Aes.Create();
             var ivBytes = aes.IV;
             savedPassword.Password = _cryptoService.Encrypt(savedPassword.Password, masterPasswordBytes, ivBytes);

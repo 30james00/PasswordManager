@@ -31,7 +31,7 @@ public class AccountService : IAccountService
             : _hashService.HashWithHMAC(password, salt);
     }
 
-    public byte[] GetMasterPasswordBytes(string password)
+    public byte[] GetMasterPasswordKey(string password)
     {
         return Convert.FromBase64String(
             _hashService.HashWithMD5(_hashService.HashWithHMAC(password, _configuration["Pepper"])));

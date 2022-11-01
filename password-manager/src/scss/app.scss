@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+
+@import '@/scss/variables.scss';
+
+#app {
+  @include col;
+  max-width: 1250px;
+}
+
+body {
+  @include col;
+  font-family: 'Inter', sans-serif;
+}
+
+.row {
+  @include row;
+  margin: 0.3em 0;
+}
+
+.col {
+  @include col;
+}
+
+input, select {
+  background-color: white;
+  padding: .8em .8em;
+  appearance: none;
+  border-radius: 1em;
+}
+
+input[type="checkbox"] {
+  appearance: auto;
+  width: 1.5em;
+  height: 1.5em;
+  accent-color: red;
+}

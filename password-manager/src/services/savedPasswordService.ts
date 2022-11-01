@@ -1,13 +1,13 @@
-import axios from '@/common/axios';
 import type {
-  CreatePasswordDto,
-  EditPasswordDto,
-  SavedPassword,
+  ICreatePasswordDto,
+  IEditPasswordDto,
+  ISavedPassword,
 } from '@/models/savedPasswordModels';
+import axios from 'axios';
 
 const CONTROLLER = 'account';
 
-export async function listPasswords(): Promise<Array<SavedPassword> | null> {
+export async function listPasswords(): Promise<Array<ISavedPassword> | null> {
   let responce;
   try {
     responce = await axios.get(`/${CONTROLLER}`);
@@ -19,8 +19,8 @@ export async function listPasswords(): Promise<Array<SavedPassword> | null> {
 }
 
 export async function createPassword(
-  createPasswordDto: CreatePasswordDto
-): Promise<SavedPassword | null> {
+  createPasswordDto: ICreatePasswordDto
+): Promise<ISavedPassword | null> {
   let responce;
   try {
     responce = await axios.post(`/${CONTROLLER}`, createPasswordDto);
@@ -32,8 +32,8 @@ export async function createPassword(
 }
 
 export async function editPassword(
-  editPasswordDto: EditPasswordDto
-): Promise<SavedPassword | null> {
+  editPasswordDto: IEditPasswordDto
+): Promise<ISavedPassword | null> {
   let responce;
   try {
     responce = await axios.patch(`/${CONTROLLER}`, editPasswordDto);

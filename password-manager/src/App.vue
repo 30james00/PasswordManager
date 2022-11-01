@@ -1,17 +1,26 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from "vue-router";
+import { RouterView } from "vue-router";
+import AccountInfo from "./components/AccountInfo.vue";
 </script>
 
 <template>
-  <header>
-    <div>
-      <nav>
-      </nav>
-    </div>
+  <header :class="$style.component">
+    <img :class="$style.logo" src="@/assets/logo.svg" alt="Logo">
+    <h1>PasswordManager</h1>
   </header>
+  <AccountInfo />
   <RouterView />
-
 </template>
 
-<style scoped>
+<style lang="scss" module>
+@import '@/scss/variables.scss';
+
+.component {
+  @include col;
+  align-items: center;
+}
+
+.logo {
+  max-width: 50%;
+}
 </style>

@@ -1,4 +1,4 @@
-export interface SavedPassword {
+export interface ISavedPassword {
   id: string;
   webAddress: string;
   description: string;
@@ -6,13 +6,13 @@ export interface SavedPassword {
   accountId: string;
 }
 
-export interface CreatePasswordDto {
+export interface ICreatePasswordDto {
   password: string;
   description: string;
   login: string;
 }
 
-export interface EditPasswordDto {
+export interface IEditPasswordDto {
   id: string;
   password: string;
   description: string;

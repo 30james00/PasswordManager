@@ -30,9 +30,9 @@ public class SavedPasswordsController : BaseApiController
 
     [Authorize]
     [HttpDelete("{id:guid}")]
-    public async Task<ActionResult> DeletePassword(DeletePasswordCommand command)
+    public async Task<ActionResult> DeletePassword(Guid id)
     {
-        return HandleResult(await Mediator.Send(command));
+        return HandleResult(await Mediator.Send(new DeletePasswordCommand(id)));
     }
 
     [Authorize]

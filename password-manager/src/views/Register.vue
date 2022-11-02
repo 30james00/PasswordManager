@@ -20,8 +20,8 @@ export default defineComponent({
         return;
       }
       try {
-        let responce = await this.$axios.post('/account/register', this.registerDto);
-        this.accountStore.login(responce.data);
+        let response = await this.$axios.post('/account/register', this.registerDto);
+        this.accountStore.login(response.data);
       } catch (e) {
         console.log('Error registering new Account');
         return;

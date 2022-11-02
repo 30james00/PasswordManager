@@ -2,6 +2,9 @@
 
 import { defineComponent } from '@vue/runtime-dom';
 import type { ISavedPassword } from '@/models/savedPasswordModels'
+import { useToast } from 'vue-toastification';
+
+const toast = useToast();
 
 export default defineComponent({
   name: "SavedPasswordList",
@@ -13,13 +16,33 @@ export default defineComponent({
   methods: {
     async handleRefresh(): Promise<void> {
       try {
-        let responce = await this.$axios.get('/savedPasswords');
-        this.savedPasswords = responce.data;
+        let response = await this.$axios.get('/savedPasswords');
+        this.savedPasswords = response.data;
       } catch (e) {
-        console.log('Error refreshing SavedPasswords');
+        toast.error('Error refreshing SavedPasswords');
         return;
       }
-    }
+    },
+    async handleDecrypt(savedPassword: ISavedPassword): Promise<void> {
+      try {
+        let response = await this.$axios.get(`savedPasswords/decrypt/${savedPassword.id}`);
+        savedPassword.password = response.data;
+      }
+      catch (e) {
+        toast.error(`Failed to decrypt ${savedPassword.login} password`);
+        return;
+      };
+    },
+    async handleDelete(savedPassword: ISavedPassword): Promise<void> {
+      try {
+        await this.$axios.delete(`savedPasswords/${savedPassword.id}`);
+        this.handleRefresh()
+      }
+      catch (e) {
+        toast.error(`Failed to delete ${savedPassword.login} password`);
+        return;
+      }
+    },
   },
   async created() {
     await this.handleRefresh();
@@ -28,7 +51,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <RouterLink :to="{name: 'password-create'}">Save password</RouterLink>
+  <RouterLink :to="{ name: 'password-create' }">Save password</RouterLink>
   <table>
     <tr>
       <th>Login</th>
@@ -40,13 +63,13 @@ export default defineComponent({
       <th>Delete</th>
     </tr>
     <tr v-for="savedPassword in savedPasswords" :key="savedPassword.id">
-      <td>{{savedPassword.login}}</td>
-      <td>***</td>
-      <td>{{savedPassword.webAddress}}</td>
-      <td>{{savedPassword.description}}</td>
-      <td>Decrypt</td>
+      <td>{{ savedPassword.login }}</td>
+      <td>{{ savedPassword.password ?? "***" }}</td>
+      <td>{{ savedPassword.webAddress }}</td>
+      <td>{{ savedPassword.description }}</td>
+      <td @click="handleDecrypt(savedPassword)">Decrypt</td>
       <td>Edit</td>
-      <td>Delete</td>
+      <td @click="handleDelete(savedPassword)">Delete</td>
     </tr>
   </table>
 </template>

@@ -14,8 +14,8 @@ export default defineComponent({
   methods: {
     async handleSubmit(): Promise<void> {
       try {
-        let responce = await this.$axios.post('/account/login', this.loginDto);
-        this.accountStore.login(responce.data);
+        let response = await this.$axios.post('/account/login', this.loginDto);
+        this.accountStore.login(response.data);
       } catch (e) {
         console.log('Error loging in');
         return;

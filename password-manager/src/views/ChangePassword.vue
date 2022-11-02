@@ -20,8 +20,8 @@ export default defineComponent({
         return;
       }
       try {
-        let responce = await this.$axios.patch('/account/change-password', this.changePasswordDto);
-        this.accountStore.login(responce.data);
+        let response = await this.$axios.patch('/account/change-password', this.changePasswordDto);
+        this.accountStore.login(response.data);
       } catch (e) {
         console.log('Error changing password');
         return;

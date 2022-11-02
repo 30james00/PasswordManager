@@ -1,29 +1,29 @@
 <script lang="ts">
-import type { IRegisterDto } from '@/models/accountModels';
+import type { IChangePasswordDto, IRegisterDto } from '@/models/accountModels';
 import { useAccountStore } from '@/stores/accountStore';
 import { defineComponent } from '@vue/runtime-dom';
 import { useToast } from 'vue-toastification';
 
 export default defineComponent({
-  name: "Register",
+  name: "ChangePassword",
   data() {
     return {
-      registerDto: {} as IRegisterDto,
+      changePasswordDto: {} as IChangePasswordDto,
       repeatPassword: '',
       accountStore: useAccountStore(),
     }
   },
   methods: {
     async handleSubmit(): Promise<void> {
-      if (this.registerDto.password != this.repeatPassword) {
-        useToast().error("Passwords doesn't match");
+      if (this.changePasswordDto.newPassword != this.repeatPassword) {
+        useToast().error("New passwords doesn't match");
         return;
       }
       try {
-        let responce = await this.$axios.post('/account/register', this.registerDto);
+        let responce = await this.$axios.patch('/account/change-password', this.changePasswordDto);
         this.accountStore.login(responce.data);
       } catch (e) {
-        console.log('Error registering new Account');
+        console.log('Error changing password');
         return;
       }
     }
@@ -33,11 +33,14 @@ export default defineComponent({
 
 <template>
   <form v-on:submit.prevent="handleSubmit" :class="$style.component">
-    <input v-model="registerDto.login" required type="text" name="login" placeholder="Login">
-    <input v-model="registerDto.password" required type="password" name="password" placeholder="Password">
-    <input v-model="repeatPassword" type="password" name="repassword" required placeholder="Repeat password">
+    <input v-model="changePasswordDto.oldPassword" required type="password" name="old-password"
+      placeholder="Old Password">
+    <input v-model="changePasswordDto.newPassword" required type="password" name="new-password"
+      placeholder="New Password">
+    <input v-model="repeatPassword" type="password" name="repassword" required placeholder="Repeat New Password">
     <div :class="$style['label-row']">
-      <input v-model="registerDto.isPasswordKeptAsHash" type="checkbox" class="checkbox" name="is-hash" id="is-hash">
+      <input v-model="changePasswordDto.isPasswordKeptAsHash" type="checkbox" class="checkbox" name="is-hash"
+        id="is-hash">
       <label for="id-hash">Is password kept as hash?</label>
     </div>
     <input type="submit" name="submit" id="submit">

@@ -14,7 +14,9 @@ export default defineComponent({
 
 <template>
   <div :class="$style.component">
-    <p>{{ accountStore.account != null ? "Account: " + accountStore.account.login : "Login" }}</p>
+    <RouterLink :to="{ name: accountStore.isLoggedIn ? 'change-password' : 'login' }">{{ accountStore.isLoggedIn ?
+        "Account:" + accountStore.account!.login : "Login"
+    }}</RouterLink>
     <p v-if="accountStore.account != null" @click="accountStore.logout">Logout</p>
   </div>
 </template>

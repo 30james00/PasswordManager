@@ -9,6 +9,7 @@ export interface ISavedPassword {
 export interface ICreatePasswordDto {
   password: string;
   description: string;
+  webAddress: string;
   login: string;
 }
 
@@ -16,5 +17,6 @@ export interface IEditPasswordDto {
   id: string;
   password: string;
   description: string;
+  webAddress: string;
   login: string;
 }

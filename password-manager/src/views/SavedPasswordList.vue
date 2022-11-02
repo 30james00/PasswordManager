@@ -28,6 +28,7 @@ export default defineComponent({
 </script>
 
 <template>
+  <RouterLink :to="{name: 'password-create'}">Save password</RouterLink>
   <table>
     <tr>
       <th>Login</th>
@@ -35,12 +36,17 @@ export default defineComponent({
       <th>Website</th>
       <th>Description</th>
       <th>Decrypt</th>
+      <th>Edit</th>
+      <th>Delete</th>
     </tr>
     <tr v-for="savedPassword in savedPasswords" :key="savedPassword.id">
       <td>{{savedPassword.login}}</td>
       <td>***</td>
       <td>{{savedPassword.webAddress}}</td>
       <td>{{savedPassword.description}}</td>
+      <td>Decrypt</td>
+      <td>Edit</td>
+      <td>Delete</td>
     </tr>
   </table>
 </template>

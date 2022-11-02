@@ -1,3 +1,5 @@
+import ChangePassword from '@/views/ChangePassword.vue';
+import CreatePassword from '@/views/CreatePassword.vue';
 import Login from '@/views/Login.vue';
 import Register from '@/views/Register.vue';
 import SavedPasswordList from '@/views/SavedPasswordList.vue';
@@ -17,9 +19,19 @@ const router = createRouter({
       component: Login,
     },
     {
+      path: '/change-password',
+      name: 'change-password',
+      component: ChangePassword,
+    },
+    {
       path: '/passwords',
       name: 'password-list',
       component: SavedPasswordList,
+    },
+    {
+      path: '/passwords/create',
+      name: 'password-create',
+      component: CreatePassword,
     },
     // {
     //   path: "/about",

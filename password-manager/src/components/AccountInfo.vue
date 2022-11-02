@@ -1,21 +1,21 @@
 <script lang="ts">
-import { login } from '@/services/accountService';
-import { useAccountStore } from '@/stores/counter';
+import { useAccountStore } from '@/stores/accountStore';
 import { defineComponent } from '@vue/runtime-dom';
 
 export default defineComponent({
   name: "AccountInfo",
   data() {
     return {
-      account: useAccountStore().$state.account,
+      accountStore: useAccountStore(),
     }
-  }
+  },
 })
 </script>
 
 <template>
   <div :class="$style.component">
-    <p>{{ account.login ?? "Login" }}</p>
+    <p>{{ accountStore.account != null ? "Account: " + accountStore.account.login : "Login" }}</p>
+    <p v-if="accountStore.account != null" @click="accountStore.logout">Logout</p>
   </div>
 </template>
 
@@ -23,7 +23,7 @@ export default defineComponent({
 @import '@/scss/variables.scss';
 
 .component {
-  @include row;
+  @include col;
   position: fixed;
   right: 1em;
 }

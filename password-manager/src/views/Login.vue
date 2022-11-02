@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { ILoginDto } from '@/models/accountModels';
-import { useAccountStore } from '@/stores/counter';
+import { useAccountStore } from '@/stores/accountStore';
 import { defineComponent } from '@vue/runtime-dom';
 
 export default defineComponent({
@@ -15,7 +15,7 @@ export default defineComponent({
     async handleSubmit(): Promise<void> {
       try {
         let responce = await this.$axios.post('/account/login', this.loginDto);
-        this.accountStore.$patch({ account: responce.data });
+        this.accountStore.login(responce.data);
       } catch (e) {
         console.log('Error loging in');
         return;

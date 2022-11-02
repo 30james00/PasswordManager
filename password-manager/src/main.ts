@@ -4,7 +4,7 @@ import { createPinia } from 'pinia';
 import App from './App.vue';
 import router from './router';
 import axios from '@/plugins/axios'
-import { useAccountStore } from './stores/counter';
+import { useAccountStore } from './stores/accountStore';
 import type { AxiosInstance } from 'axios';
 
 const app = createApp(App);

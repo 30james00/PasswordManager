@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { IRegisterDto } from '@/models/accountModels';
-import { useAccountStore } from '@/stores/counter';
+import { useAccountStore } from '@/stores/accountStore';
 import { defineComponent } from '@vue/runtime-dom';
 
 export default defineComponent({
@@ -17,7 +17,7 @@ export default defineComponent({
       if (this.registerDto.password == this.repeatPassword) return;
       try {
         let responce = await this.$axios.post('/account/register', this.registerDto);
-        this.accountStore.$patch({ account: responce.data });
+        this.accountStore.login(responce.data);
       } catch (e) {
         console.log('Error registering new Account');
         return;

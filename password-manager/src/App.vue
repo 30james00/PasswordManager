@@ -6,7 +6,7 @@ import AccountInfo from "./components/AccountInfo.vue";
 <template>
   <header :class="$style.component">
     <img :class="$style.logo" src="@/assets/logo.svg" alt="Logo">
-    <h1>PasswordManager</h1>
+    <h1 :class="$style.title">PasswordManager</h1>
   </header>
   <AccountInfo />
   <RouterView />
@@ -22,5 +22,14 @@ import AccountInfo from "./components/AccountInfo.vue";
 
 .logo {
   max-width: 50%;
+}
+
+.title {
+  /* Gradient */
+  background: linear-gradient(135deg, #F20000 0%, #C00000 0.01%, #230000 100%, #230000 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
 }
 </style>

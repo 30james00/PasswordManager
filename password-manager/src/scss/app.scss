@@ -21,16 +21,19 @@ body {
   @include col;
 }
 
-input, select {
-  background-color: white;
-  padding: .8em .8em;
+input,
+select {
+  accent-color: #550101;
   appearance: none;
+  background-color: white;
   border-radius: 1em;
+  padding: 0.8em 0.8em;
+  margin: 0.25em 0;
 }
 
-input[type="checkbox"] {
+input[type='checkbox'] {
   appearance: auto;
+  margin: 0.3em 0.3em;
   width: 1.5em;
   height: 1.5em;
-  accent-color: red;
 }

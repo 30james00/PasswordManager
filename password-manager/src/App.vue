@@ -26,7 +26,7 @@ import AccountInfo from "./components/AccountInfo.vue";
 
 .title {
   /* Gradient */
-  background: linear-gradient(135deg, #F20000 0%, #C00000 0.01%, #230000 100%, #230000 100%);
+  background: $gradient;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

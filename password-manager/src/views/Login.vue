@@ -29,18 +29,24 @@ export default defineComponent({
 </script>
 
 <template>
-  <form v-on:submit.prevent="handleSubmit" :class="$style.component">
-    <input v-model="loginDto.login" required type="text" name="login" placeholder="Login">
-    <input v-model="loginDto.password" required type="password" name="password" placeholder="Password">
-    <input type="submit" name="submit" id="submit" value="Login">
-  </form>
-  <RouterLink class="nav-link" :to="{ name: 'register' }">Register instead</RouterLink>
+  <div :class="$style.component">
+    <form v-on:submit.prevent="handleSubmit" :class="$style.form">
+      <input v-model="loginDto.login" required type="text" name="login" placeholder="Login">
+      <input v-model="loginDto.password" required type="password" name="password" placeholder="Password">
+      <input type="submit" name="submit" id="submit" value="Login">
+    </form>
+    <RouterLink class="nav-link" :to="{ name: 'register' }">Register instead</RouterLink>
+  </div>
 </template>
 
 <style lang="scss" module>
 @import '@/scss/variables.scss';
 
 .component {
+  @include col;
+}
+
+.form {
   @include col;
 }
 </style>

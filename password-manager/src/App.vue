@@ -11,7 +11,11 @@ import AccountInfo from "./components/AccountInfo.vue";
     </div>
     <AccountInfo />
   </header>
-  <RouterView />
+  <router-view v-slot="{ Component }">
+    <transition name="fade" mode="out-in">
+      <component :is="Component" />
+    </transition>
+  </router-view>
 </template>
 
 <style lang="scss" module>
@@ -56,15 +60,15 @@ import AccountInfo from "./components/AccountInfo.vue";
     @include col;
     margin-bottom: 0;
   }
-  
+
   .top {
     @include col;
   }
-  
+
   .logo {
     max-width: 200px;
   }
-  
+
   .title {
     font-size: 2em;
     margin-left: 0;

@@ -34,24 +34,29 @@ export default defineComponent({
 </script>
 
 <template>
-  <form v-on:submit.prevent="handleSubmit" :class="$style.component">
-    <input v-model="registerDto.login" required type="text" name="login" placeholder="Login">
-    <input v-model="registerDto.password" required type="password" name="password" placeholder="Password">
-    <input v-model="repeatPassword" type="password" name="repassword" required placeholder="Repeat password">
-    <div :class="$style['label-row']">
-      <input v-model="registerDto.isPasswordKeptAsHash" type="checkbox" class="checkbox" name="is-hash" id="is-hash">
-      <label for="id-hash">Is password kept as hash?</label>
-    </div>
-    <input type="submit" name="submit" id="submit" value="Register">
-  </form>
-  <RouterLink class="nav-link" :to="{ name: 'login' }">Login instead</RouterLink>
-
+  <div :class="$style.component">
+    <form v-on:submit.prevent="handleSubmit" :class="$style.form">
+      <input v-model="registerDto.login" required type="text" name="login" placeholder="Login">
+      <input v-model="registerDto.password" required type="password" name="password" placeholder="Password">
+      <input v-model="repeatPassword" type="password" name="repassword" required placeholder="Repeat password">
+      <div :class="$style['label-row']">
+        <input v-model="registerDto.isPasswordKeptAsHash" type="checkbox" class="checkbox" name="is-hash" id="is-hash">
+        <label for="id-hash">Is password kept as hash?</label>
+      </div>
+      <input type="submit" name="submit" id="submit" value="Register">
+    </form>
+    <RouterLink class="nav-link" :to="{ name: 'login' }">Login instead</RouterLink>
+  </div>
 </template>
 
 <style lang="scss" module>
 @import '@/scss/variables.scss';
 
 .component {
+  @include col;
+}
+
+.form {
   @include col;
 }
 

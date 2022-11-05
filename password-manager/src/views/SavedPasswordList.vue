@@ -61,43 +61,45 @@ export default defineComponent({
 </script>
 
 <template>
-  <CustomButton @click="handleAddNew" text="Add New Password" />
-  <table>
-    <thead>
-      <tr>
-        <th scope="col">Login</th>
-        <th scope="col">Password</th>
-        <th scope="col">Website</th>
-        <th scope="col">Description</th>
-        <th scope="col">Decrypt</th>
-        <th scope="col">Edit</th>
-        <th scope="col">Delete</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="savedPassword in savedPasswords" :key="savedPassword.id">
-        <td scope="row" data-label="Login">{{ savedPassword.login }}</td>
-        <td data-label="Password">{{ savedPassword.password ?? "***" }}</td>
-        <td data-label="Website">{{ savedPassword.webAddress }}</td>
-        <td data-label="Description">{{ savedPassword.description }}</td>
-        <td data-label="Decrypt" @click="handleDecrypt(savedPassword)">
-          <div :class="$style.tbutton">
-            <CustomIconButton icon="fa-solid fa-key" />
-          </div>
-        </td>
-        <td data-label="Edit" @click="handleEdit(savedPassword)">
-          <div :class="$style.tbutton">
-            <CustomIconButton icon="fa-solid fa-pen" bg="#279AF1" />
-          </div>
-        </td>
-        <td data-label="Delete" @click="handleDelete(savedPassword)">
-          <div :class="$style.tbutton">
-            <CustomIconButton icon="fa-solid fa-trash" bg="red" />
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div :class="$style.component">
+    <CustomButton @click="handleAddNew" text="Add New Password" />
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Login</th>
+          <th scope="col">Password</th>
+          <th scope="col">Website</th>
+          <th scope="col">Description</th>
+          <th scope="col">Decrypt</th>
+          <th scope="col">Edit</th>
+          <th scope="col">Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="savedPassword in savedPasswords" :key="savedPassword.id">
+          <td scope="row" data-label="Login">{{ savedPassword.login }}</td>
+          <td data-label="Password">{{ savedPassword.password ?? "***" }}</td>
+          <td data-label="Website">{{ savedPassword.webAddress }}</td>
+          <td data-label="Description">{{ savedPassword.description }}</td>
+          <td data-label="Decrypt" @click="handleDecrypt(savedPassword)">
+            <div :class="$style.tbutton">
+              <CustomIconButton icon="fa-solid fa-key" />
+            </div>
+          </td>
+          <td data-label="Edit" @click="handleEdit(savedPassword)">
+            <div :class="$style.tbutton">
+              <CustomIconButton icon="fa-solid fa-pen" bg="#279AF1" />
+            </div>
+          </td>
+          <td data-label="Delete" @click="handleDelete(savedPassword)">
+            <div :class="$style.tbutton">
+              <CustomIconButton icon="fa-solid fa-trash" bg="red" />
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <style lang="scss" module>

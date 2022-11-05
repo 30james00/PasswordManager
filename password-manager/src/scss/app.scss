@@ -2,8 +2,13 @@
 
 @import '@/scss/variables.scss';
 
+body {
+  @include col;
+}
+
 #app {
   @include col;
+  width: 100%;
   max-width: 1250px;
   font-family: 'Inter', sans-serif;
 }

@@ -44,9 +44,9 @@ export default defineComponent({
 
 <template>
   <form v-on:submit.prevent="handleEdit" :class="$style.component">
-    <input v-model="editPassword.login" required type="text" name="login" placeholder="Login">
+    <input v-model="editPassword.webAddress" required type="text" name="web-address" placeholder="Website">
     <input v-model="editPassword.password" required type="password" name="password" placeholder="Password">
-    <input v-model="editPassword.webAddress" type="text" name="web-address" placeholder="Website">
+    <input v-model="editPassword.login" type="text" name="login" placeholder="Login">
     <input v-model="editPassword.description" type="text" name="description" placeholder="Description">
     <input type="submit" name="submit" id="submit">
   </form>

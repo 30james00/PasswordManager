@@ -18,7 +18,7 @@ export default defineComponent({
       <font-awesome-icon :class="$style.icon" icon="fa-solid fa-user" />
       <RouterLink :class="$style.text" :to="{ name: accountStore.isLoggedIn ? 'change-password' : 'login' }">{{
           accountStore.isLoggedIn ?
-            "Account: " + accountStore.account!.login : "Login"
+            accountStore.account!.login : "Login"
       }}</RouterLink>
     </div>
     <span :class="$style.logout" v-if="accountStore.account != null" @click="accountStore.logout">Logout</span>

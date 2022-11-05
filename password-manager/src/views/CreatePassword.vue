@@ -27,9 +27,9 @@ export default defineComponent({
 
 <template>
   <form v-on:submit.prevent="handleCreate" :class="$style.component">
-    <input v-model="createPassword.login" required type="text" name="login" placeholder="Login">
+    <input v-model="createPassword.webAddress" required type="text" name="web-address" placeholder="Website">
     <input v-model="createPassword.password" required type="password" name="password" placeholder="Password">
-    <input v-model="createPassword.webAddress" type="text" name="web-address" placeholder="Website">
+    <input v-model="createPassword.login" type="text" name="login" placeholder="Login">
     <input v-model="createPassword.description" type="text" name="description" placeholder="Description">
     <input type="submit" name="submit" id="submit">
   </form>

@@ -4,6 +4,7 @@ import { defineComponent } from '@vue/runtime-dom';
 import type { ISavedPassword } from '@/models/savedPasswordModels'
 import { useToast } from 'vue-toastification';
 import CustomButton from '@/components/CustomButton.vue';
+import CustomIconButton from '@/components/CustomIconButton.vue';
 
 const toast = useToast();
 
@@ -55,31 +56,47 @@ export default defineComponent({
   async created() {
     await this.handleRefresh();
   },
-  components: { CustomButton }
+  components: { CustomButton, CustomIconButton }
 });
 </script>
 
 <template>
   <CustomButton @click="handleAddNew" text="Add New Password" />
   <table>
-    <tr>
-      <th>Login</th>
-      <th>Password</th>
-      <th>Website</th>
-      <th>Description</th>
-      <th>Decrypt</th>
-      <th>Edit</th>
-      <th>Delete</th>
-    </tr>
-    <tr v-for="savedPassword in savedPasswords" :key="savedPassword.id">
-      <td>{{ savedPassword.login }}</td>
-      <td>{{ savedPassword.password ?? "***" }}</td>
-      <td>{{ savedPassword.webAddress }}</td>
-      <td>{{ savedPassword.description }}</td>
-      <td @click="handleDecrypt(savedPassword)">Decrypt</td>
-      <td @click="handleEdit(savedPassword)"> Edit</td>
-      <td @click="handleDelete(savedPassword)">Delete</td>
-    </tr>
+    <thead>
+      <tr>
+        <th scope="col">Login</th>
+        <th scope="col">Password</th>
+        <th scope="col">Website</th>
+        <th scope="col">Description</th>
+        <th scope="col">Decrypt</th>
+        <th scope="col">Edit</th>
+        <th scope="col">Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="savedPassword in savedPasswords" :key="savedPassword.id">
+        <td scope="row" data-label="Login">{{ savedPassword.login }}</td>
+        <td data-label="Password">{{ savedPassword.password ?? "***" }}</td>
+        <td data-label="Website">{{ savedPassword.webAddress }}</td>
+        <td data-label="Description">{{ savedPassword.description }}</td>
+        <td data-label="Decrypt" @click="handleDecrypt(savedPassword)">
+          <div :class="$style.tbutton">
+            <CustomIconButton icon="fa-solid fa-key" />
+          </div>
+        </td>
+        <td data-label="Edit" @click="handleEdit(savedPassword)">
+          <div :class="$style.tbutton">
+            <CustomIconButton icon="fa-solid fa-pen" bg="#279AF1" />
+          </div>
+        </td>
+        <td data-label="Delete" @click="handleDelete(savedPassword)">
+          <div :class="$style.tbutton">
+            <CustomIconButton icon="fa-solid fa-trash" bg="red" />
+          </div>
+        </td>
+      </tr>
+    </tbody>
   </table>
 </template>
 
@@ -88,5 +105,76 @@ export default defineComponent({
 
 .component {
   @include col;
+}
+
+.tbutton {
+  @include col;
+}
+
+table {
+  border-collapse: collapse;
+  margin-top: 1.5em;
+  padding: 0;
+}
+
+table tr {
+  padding: .35em;
+}
+
+table th,
+table td {
+  padding: .625em;
+  text-align: center;
+}
+
+table th {
+  color: $light
+}
+
+@media screen and (max-width: 700px) {
+  table {
+    border: 0;
+    width: 100%;
+  }
+
+  table thead {
+    border: none;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+  }
+
+  table tr {
+    border: 3px solid $light;
+    display: block;
+    margin-bottom: .625em;
+    border-radius: 1em;
+  }
+
+  table td {
+    @include row;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    color: $light;
+    font-size: .8em;
+    justify-content: space-between;
+  }
+
+  table td::before {
+    content: attr(data-label);
+    font-weight: bold;
+  }
+
+  table td:last-child {
+    border-bottom: 0;
+  }
+
+  .tbutton {
+    align-items: flex-end;
+  }
 }
 </style>

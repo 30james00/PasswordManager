@@ -37,16 +37,17 @@ import AccountInfo from "./components/AccountInfo.vue";
 
 .title {
   /* Gradient */
-  font-size: 1em;
   background: $gradient;
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 1.15em;
+  margin-left: .5em;
 }
 
 @media screen and (min-width: 400px) {
   .title {
-    font-size: 1.15em;
+    font-size: 1.25em;
   }
 }
 
@@ -55,17 +56,18 @@ import AccountInfo from "./components/AccountInfo.vue";
     @include col;
     margin-bottom: 0;
   }
-
+  
   .top {
     @include col;
   }
-
+  
   .logo {
     max-width: 200px;
   }
-
+  
   .title {
     font-size: 2em;
+    margin-left: 0;
   }
 }
 </style>

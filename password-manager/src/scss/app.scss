@@ -23,18 +23,19 @@ body {
 
 input,
 select {
-  accent-color: #550101;
+  accent-color: $light;
   appearance: none;
   background-color: white;
   border: 3px solid $light;
   border-radius: 1em;
+  color: $light;
   padding: 0.8em 0.8em;
   margin: 0.25em 0;
 }
 
-input::selection, select::selection {
+input::selection,
+select::selection {
   border: 3px solid black;
-
 }
 
 input[type='checkbox'] {
@@ -42,4 +43,11 @@ input[type='checkbox'] {
   margin: 0.3em 0.3em;
   width: 1.5em;
   height: 1.5em;
+}
+
+.nav-link {
+  color: $light;
+  font-weight: bold;
+  text-decoration: none;
+  margin: 0.5em 0;
 }

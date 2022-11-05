@@ -32,8 +32,9 @@ export default defineComponent({
   <form v-on:submit.prevent="handleSubmit" :class="$style.component">
     <input v-model="loginDto.login" required type="text" name="login" placeholder="Login">
     <input v-model="loginDto.password" required type="password" name="password" placeholder="Password">
-    <input type="submit" name="submit" id="submit">
+    <input type="submit" name="submit" id="submit" value="Login">
   </form>
+  <RouterLink class="nav-link" :to="{ name: 'register' }">Register instead</RouterLink>
 </template>
 
 <style lang="scss" module>

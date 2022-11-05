@@ -21,7 +21,7 @@ import AccountInfo from "./components/AccountInfo.vue";
 }
 
 .logo {
-  max-width: 50%;
+  max-width: 200px;
 }
 
 .title {

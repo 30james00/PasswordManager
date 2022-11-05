@@ -2,6 +2,9 @@
 import type { ILoginDto } from '@/models/accountModels';
 import { useAccountStore } from '@/stores/accountStore';
 import { defineComponent } from '@vue/runtime-dom';
+import { useToast } from 'vue-toastification';
+
+const toast = useToast();
 
 export default defineComponent({
   name: "Login",
@@ -17,7 +20,7 @@ export default defineComponent({
         let response = await this.$axios.post('/account/login', this.loginDto);
         this.accountStore.login(response.data);
       } catch (e) {
-        console.log('Error loging in');
+        toast.error('Error loging in');
         return;
       }
     }

@@ -4,6 +4,8 @@ import { useAccountStore } from '@/stores/accountStore';
 import { defineComponent } from '@vue/runtime-dom';
 import { useToast } from 'vue-toastification';
 
+const toast = useToast();
+
 export default defineComponent({
   name: "Register",
   data() {
@@ -16,14 +18,14 @@ export default defineComponent({
   methods: {
     async handleSubmit(): Promise<void> {
       if (this.registerDto.password != this.repeatPassword) {
-        useToast().error("Passwords doesn't match");
+        toast.error("Passwords doesn't match");
         return;
       }
       try {
         let response = await this.$axios.post('/account/register', this.registerDto);
         this.accountStore.login(response.data);
       } catch (e) {
-        console.log('Error registering new Account');
+        toast.error('Error registering new Account');
         return;
       }
     }

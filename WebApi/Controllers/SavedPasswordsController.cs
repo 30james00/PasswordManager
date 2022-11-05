@@ -15,6 +15,13 @@ public class SavedPasswordsController : BaseApiController
     }
 
     [Authorize]
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<List<SavedPasswordDto>>> DetailPassword(Guid id)
+    {
+        return HandleResult(await Mediator.Send(new DetailPasswordQuery(id)));
+    }
+
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<SavedPasswordDto>> CreatePassword(CreatePasswordCommand command)
     {

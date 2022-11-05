@@ -2,6 +2,7 @@
 
 import { defineComponent } from '@vue/runtime-dom';
 import type { ICreatePasswordDto, ISavedPassword } from '@/models/savedPasswordModels'
+import { useToast } from 'vue-toastification';
 
 export default defineComponent({
   name: "CreatePassword",
@@ -16,7 +17,7 @@ export default defineComponent({
         await this.$axios.post('/savedPasswords', this.createPassword);
         this.$router.push({ name: 'password-list' });
       } catch (e) {
-        console.log('Error refreshing SavedPasswords');
+        useToast().error('Error saving new Password');
         return;
       }
     }

@@ -33,6 +33,9 @@ export default defineComponent({
         return;
       };
     },
+    handleEdit(savedPassword: ISavedPassword): void {
+      this.$router.push({ name: 'password-edit', params: { passwordId: savedPassword.id } })
+    },
     async handleDelete(savedPassword: ISavedPassword): Promise<void> {
       try {
         await this.$axios.delete(`savedPasswords/${savedPassword.id}`);
@@ -68,7 +71,7 @@ export default defineComponent({
       <td>{{ savedPassword.webAddress }}</td>
       <td>{{ savedPassword.description }}</td>
       <td @click="handleDecrypt(savedPassword)">Decrypt</td>
-      <td>Edit</td>
+      <td @click="handleEdit(savedPassword)"> Edit</td>
       <td @click="handleDelete(savedPassword)">Delete</td>
     </tr>
   </table>

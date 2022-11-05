@@ -1,8 +1,11 @@
+import type { IEditPasswordDto } from '@/models/savedPasswordModels';
 import ChangePassword from '@/views/ChangePassword.vue';
-import CreatePassword from '@/views/CreatePassword.vue';
+import EditPassword from '@/views/EditPassword.vue';
+import CreatePassword from '@/views/EditPassword.vue';
 import Login from '@/views/Login.vue';
 import Register from '@/views/Register.vue';
 import SavedPasswordList from '@/views/SavedPasswordList.vue';
+import type { PropType } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
@@ -32,6 +35,12 @@ const router = createRouter({
       path: '/passwords/create',
       name: 'password-create',
       component: CreatePassword,
+    },
+    {
+      path: '/passwords/edit/:passwordId',
+      name: 'password-edit',
+      component: EditPassword,
+      props: true,
     },
     // {
     //   path: "/about",

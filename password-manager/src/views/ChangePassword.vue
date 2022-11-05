@@ -4,6 +4,8 @@ import { useAccountStore } from '@/stores/accountStore';
 import { defineComponent } from '@vue/runtime-dom';
 import { useToast } from 'vue-toastification';
 
+const toast = useToast();
+
 export default defineComponent({
   name: "ChangePassword",
   data() {
@@ -16,14 +18,14 @@ export default defineComponent({
   methods: {
     async handleSubmit(): Promise<void> {
       if (this.changePasswordDto.newPassword != this.repeatPassword) {
-        useToast().error("New passwords doesn't match");
+        toast.error("New passwords doesn't match");
         return;
       }
       try {
         let response = await this.$axios.patch('/account/change-password', this.changePasswordDto);
         this.accountStore.login(response.data);
       } catch (e) {
-        console.log('Error changing password');
+        toast.error('Error changing password');
         return;
       }
     }

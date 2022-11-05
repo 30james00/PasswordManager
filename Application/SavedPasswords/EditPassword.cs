@@ -71,7 +71,6 @@ public class EditPasswordCommandHandler : IRequestHandler<EditPasswordCommand, A
         savedPassword.Login = request.Login;
         savedPassword.Iv = Convert.ToBase64String(ivBytes);
 
-        await _dataContext.SavedPasswords.AddAsync(savedPassword, cancellationToken);
         var result = await _dataContext.SaveChangesAsync(cancellationToken) > 0;
         return result
             ? ApiResult<SavedPasswordDto>.Success(_mapper.Map<SavedPassword, SavedPasswordDto>(savedPassword))

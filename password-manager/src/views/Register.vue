@@ -42,8 +42,10 @@ export default defineComponent({
       <input v-model="registerDto.isPasswordKeptAsHash" type="checkbox" class="checkbox" name="is-hash" id="is-hash">
       <label for="id-hash">Is password kept as hash?</label>
     </div>
-    <input type="submit" name="submit" id="submit">
+    <input type="submit" name="submit" id="submit" value="Register">
   </form>
+  <RouterLink class="nav-link" :to="{ name: 'login' }">Login instead</RouterLink>
+
 </template>
 
 <style lang="scss" module>

@@ -20,7 +20,7 @@ export default defineComponent({
         let response = await this.$axios.post('/account/login', this.loginDto);
         this.accountStore.login(response.data);
       } catch (e) {
-        toast.error('Error loging in');
+        toast.error('Error logging in');
         return;
       }
     }

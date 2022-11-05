@@ -1,18 +1,17 @@
-import type { IEditPasswordDto } from '@/models/savedPasswordModels';
+import { useAccountStore } from '@/stores/accountStore';
 import ChangePassword from '@/views/ChangePassword.vue';
 import EditPassword from '@/views/EditPassword.vue';
 import CreatePassword from '@/views/EditPassword.vue';
 import Login from '@/views/Login.vue';
 import Register from '@/views/Register.vue';
 import SavedPasswordList from '@/views/SavedPasswordList.vue';
-import type { PropType } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
+      path: '/register',
       name: 'register',
       component: Register,
     },
@@ -27,7 +26,7 @@ const router = createRouter({
       component: ChangePassword,
     },
     {
-      path: '/passwords',
+      path: '/',
       name: 'password-list',
       component: SavedPasswordList,
     },
@@ -51,6 +50,14 @@ const router = createRouter({
     //   component: () => import("../views/AboutView.vue"),
     // },
   ],
+});
+
+router.beforeEach((to) => {
+  const accountStore = useAccountStore();
+  const toName = to.name?.toString() ?? ""
+
+  if (!['register', 'login'].includes(toName) && !accountStore.isLoggedIn) return { name: 'login' };
+  if (['register', 'login'].includes(toName) && accountStore.isLoggedIn) return { name: 'password-list' };
 });
 
 export default router;

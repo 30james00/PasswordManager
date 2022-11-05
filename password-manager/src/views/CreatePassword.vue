@@ -1,7 +1,7 @@
 <script lang="ts">
 
 import { defineComponent } from '@vue/runtime-dom';
-import type { ICreatePasswordDto, ISavedPassword } from '@/models/savedPasswordModels'
+import type { ICreatePasswordDto } from '@/models/savedPasswordModels'
 import { useToast } from 'vue-toastification';
 
 export default defineComponent({

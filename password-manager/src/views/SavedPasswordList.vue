@@ -3,6 +3,7 @@
 import { defineComponent } from '@vue/runtime-dom';
 import type { ISavedPassword } from '@/models/savedPasswordModels'
 import { useToast } from 'vue-toastification';
+import CustomButton from '@/components/CustomButton.vue';
 
 const toast = useToast();
 
@@ -11,17 +12,21 @@ export default defineComponent({
   data() {
     return {
       savedPasswords: [] as ISavedPassword[],
-    }
+    };
   },
   methods: {
     async handleRefresh(): Promise<void> {
       try {
-        let response = await this.$axios.get('/savedPasswords');
+        let response = await this.$axios.get("/savedPasswords");
         this.savedPasswords = response.data;
-      } catch (e) {
-        toast.error('Error refreshing SavedPasswords');
+      }
+      catch (e) {
+        toast.error("Error refreshing SavedPasswords");
         return;
       }
+    },
+    handleAddNew(): void {
+      this.$router.push({ name: "password-create" });
     },
     async handleDecrypt(savedPassword: ISavedPassword): Promise<void> {
       try {
@@ -31,15 +36,15 @@ export default defineComponent({
       catch (e) {
         toast.error(`Failed to decrypt ${savedPassword.login} password`);
         return;
-      };
+      }
     },
     handleEdit(savedPassword: ISavedPassword): void {
-      this.$router.push({ name: 'password-edit', params: { passwordId: savedPassword.id } })
+      this.$router.push({ name: "password-edit", params: { passwordId: savedPassword.id } });
     },
     async handleDelete(savedPassword: ISavedPassword): Promise<void> {
       try {
         await this.$axios.delete(`savedPasswords/${savedPassword.id}`);
-        this.handleRefresh()
+        this.handleRefresh();
       }
       catch (e) {
         toast.error(`Failed to delete ${savedPassword.login} password`);
@@ -49,12 +54,13 @@ export default defineComponent({
   },
   async created() {
     await this.handleRefresh();
-  }
+  },
+  components: { CustomButton }
 });
 </script>
 
 <template>
-  <RouterLink :to="{ name: 'password-create' }">Save password</RouterLink>
+  <CustomButton @click="handleAddNew" text="Add New Password" />
   <table>
     <tr>
       <th>Login</th>

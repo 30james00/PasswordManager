@@ -1,7 +1,7 @@
 import { useAccountStore } from '@/stores/accountStore';
 import ChangePassword from '@/views/ChangePassword.vue';
 import EditPassword from '@/views/EditPassword.vue';
-import CreatePassword from '@/views/EditPassword.vue';
+import CreatePassword from '@/views/CreatePassword.vue';
 import Login from '@/views/Login.vue';
 import Register from '@/views/Register.vue';
 import SavedPasswordList from '@/views/SavedPasswordList.vue';

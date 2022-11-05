@@ -5,10 +5,6 @@
 #app {
   @include col;
   max-width: 1250px;
-}
-
-body {
-  @include col;
   font-family: 'Inter', sans-serif;
 }
 

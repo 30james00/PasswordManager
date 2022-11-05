@@ -30,9 +30,8 @@ export default defineComponent({
 
 .outer {
   @include col;
-  padding: 0 .25em;
-  position: fixed;
-  right: 1em;
+  align-self: flex-start;
+  padding: .25em .5em;
   border: 3px solid $light;
   border-radius: .5em;
 }
@@ -61,5 +60,19 @@ export default defineComponent({
   color: $light;
   height: 1em;
   margin-right: .35em;
+}
+
+@media screen and (max-width: 375px) {
+  .text {
+    font-size: .85em;
+  }
+}
+
+@media screen and (min-width: 600px) {
+  .outer {
+    position: absolute;
+    top: 1em;
+    right: 1em;
+  }
 }
 </style>

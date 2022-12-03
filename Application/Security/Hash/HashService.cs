@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.Text;
 using Microsoft.Extensions.Configuration;
 
 namespace PasswordManager.Application.Security.Hash;
@@ -25,8 +26,8 @@ public class HashService : IHashService
     public string HashWithMD5(string text)
     {
         // Convert string to byte array
-        byte[] bytes = System.Text.Encoding.UTF8.GetBytes(text);
-        
+        byte[] bytes = Encoding.UTF8.GetBytes(text);
+
         // Get instance of MD5 hashing algorithm
         using var md5 = MD5.Create();
         byte[] hashValue = md5.ComputeHash(bytes);
@@ -44,11 +45,15 @@ public class HashService : IHashService
         var hashValue = sha512.ComputeHash(bytes);
 
         //join separate bytes into string
-        return Convert.ToBase64String(hashValue);
+        return hashValue.Aggregate("", (current, x) => current + $"{x:x2}");
     }
 
     private string CalculateHMAC(string text, string key)
     {
+        //Check if text or key is empty 
+        if (text.Length == 0) throw new ArgumentException("Text can not be empty.");
+        if (key.Length == 0) throw new ArgumentException("Key can not be empty.");
+
         // Convert strings to byte array
         var textBytes = System.Text.Encoding.UTF8.GetBytes(text);
         var keyBytes = System.Text.Encoding.UTF8.GetBytes(key);
@@ -56,6 +61,6 @@ public class HashService : IHashService
         // Get instance of HMAC algorithm
         using var hmacSha512 = new HMACSHA512(keyBytes);
         var hashValue = hmacSha512.ComputeHash(textBytes);
-        return Convert.ToBase64String(hashValue);
+        return hashValue.Aggregate("", (current, x) => current + $"{x:x2}");
     }
 }

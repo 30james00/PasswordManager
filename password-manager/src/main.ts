@@ -22,7 +22,7 @@ app.use(router);
 
 const accountStore = useAccountStore();
 app.use(axios, {
-  baseUrl: 'https://localhost:5001/api',
+  baseUrl: 'http://localhost:5000/api',
 });
 
 const toastOptions: PluginOptions = {

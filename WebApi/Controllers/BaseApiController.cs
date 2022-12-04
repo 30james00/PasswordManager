@@ -8,9 +8,12 @@ namespace PasswordManager.Controllers
     [Route("api/[controller]")]
     public class BaseApiController : ControllerBase
     {
-        private IMediator _mediator;
+        protected IMediator _mediator;
 
-        protected IMediator Mediator => _mediator ??= HttpContext.RequestServices.GetService<IMediator>();
+        public BaseApiController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
 
         protected ActionResult HandleResult<T>(ApiResult<T>? result)
         {

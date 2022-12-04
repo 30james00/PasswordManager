@@ -4,18 +4,20 @@ namespace PasswordManager.Application.Security.Crypto;
 
 public class CryptoService : ICryptoService
 {
-    public string Encrypt(string plainText, byte[] key, byte[] iv)
+    public string Encrypt(string plainText, byte[] key, out byte[] iv)
     {
+        if (string.IsNullOrEmpty(plainText)) throw new ArgumentException("Text can not be empty.");
+
         // Get instance of AES algorithm
         using (Aes aesAlgorithm = Aes.Create())
         {
             // Set key and IV
             aesAlgorithm.Key = key;
-            aesAlgorithm.IV = iv;
+            iv = aesAlgorithm.IV;
 
             // Create encryptor object
             ICryptoTransform encryptor = aesAlgorithm.CreateEncryptor();
-            
+
             byte[] encryptedData;
 
             // Encryption will be done in a memory stream through a CryptoStream object
@@ -39,13 +41,15 @@ public class CryptoService : ICryptoService
 
     public string Decrypt(string cipherText, byte[] key, byte[] iv)
     {
+        if (string.IsNullOrEmpty(cipherText)) throw new ArgumentException("CipherText can not be empty.");
+
         // Get instance of AES algorithm
         using (Aes aesAlgorithm = Aes.Create())
         {
             // Set key and IV
             aesAlgorithm.Key = key;
             aesAlgorithm.IV = iv;
-            
+
             // Create decryptor object
             ICryptoTransform decryptor = aesAlgorithm.CreateDecryptor();
 

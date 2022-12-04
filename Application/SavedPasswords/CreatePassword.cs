@@ -51,14 +51,11 @@ public class CreatePasswordCommandHandler : IRequestHandler<CreatePasswordComman
 
         //Create key for password encryption using MasterPassword hash
         var key = _accountService.GetMasterPasswordKey(account.PasswordHash);
-        // Create IV for AES
-        using var aes = Aes.Create();
-        var ivBytes = aes.IV;
         var savedPassword = new SavedPassword
         {
             // Encrypt password
             // TODO: add out parameter to remove need of redundant aes creation
-            Password = _cryptoService.Encrypt(request.Password, key, ivBytes),
+            Password = _cryptoService.Encrypt(request.Password, key, out var ivBytes),
             WebAddress = request.WebAddress,
             Description = request.Description,
             Login = request.Login,

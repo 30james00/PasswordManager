@@ -25,6 +25,9 @@ public class HashService : IHashService
 
     public string HashWithMD5(string text)
     {
+        //Check if text is empty 
+        if (string.IsNullOrEmpty(text)) throw new ArgumentException("Text can not be empty.");
+        
         // Convert string to byte array
         byte[] bytes = Encoding.UTF8.GetBytes(text);
 
@@ -38,29 +41,29 @@ public class HashService : IHashService
     private string CalculateSHA512(string text)
     {
         // Convert string to byte array
-        var bytes = System.Text.Encoding.UTF8.GetBytes(text);
+        var bytes = Encoding.UTF8.GetBytes(text);
 
         // Get instance of SHA-512 hashing algorithm
         using var sha512 = SHA512.Create();
         var hashValue = sha512.ComputeHash(bytes);
 
         //join separate bytes into string
-        return hashValue.Aggregate("", (current, x) => current + $"{x:x2}");
+        return Convert.ToBase64String(hashValue);
     }
 
     private string CalculateHMAC(string text, string key)
     {
         //Check if text or key is empty 
-        if (text.Length == 0) throw new ArgumentException("Text can not be empty.");
-        if (key.Length == 0) throw new ArgumentException("Key can not be empty.");
+        if (string.IsNullOrEmpty(text)) throw new ArgumentException("Text can not be empty.");
+        if (string.IsNullOrEmpty(key)) throw new ArgumentException("Key can not be empty.");
 
         // Convert strings to byte array
-        var textBytes = System.Text.Encoding.UTF8.GetBytes(text);
-        var keyBytes = System.Text.Encoding.UTF8.GetBytes(key);
+        var textBytes = Encoding.UTF8.GetBytes(text);
+        var keyBytes = Encoding.UTF8.GetBytes(key);
 
         // Get instance of HMAC algorithm
         using var hmacSha512 = new HMACSHA512(keyBytes);
         var hashValue = hmacSha512.ComputeHash(textBytes);
-        return hashValue.Aggregate("", (current, x) => current + $"{x:x2}");
+        return Convert.ToBase64String(hashValue);
     }
 }

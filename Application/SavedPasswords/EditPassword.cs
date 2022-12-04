@@ -60,12 +60,9 @@ public class EditPasswordCommandHandler : IRequestHandler<EditPasswordCommand, A
 
         // Create key for password encryption using MasterPassword hash
         var key = _accountService.GetMasterPasswordKey(account.PasswordHash);
-        // Create IV for AES
-        using var aes = Aes.Create();
-        var ivBytes = aes.IV;
 
         // Edit entity fields
-        savedPassword.Password = _cryptoService.Encrypt(request.Password, key, ivBytes);
+        savedPassword.Password = _cryptoService.Encrypt(request.Password, key, out var ivBytes);
         savedPassword.WebAddress = request.WebAddress;
         savedPassword.Description = request.Description;
         savedPassword.Login = request.Login;

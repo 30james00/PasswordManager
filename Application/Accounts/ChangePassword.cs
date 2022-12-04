@@ -75,9 +75,7 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
         foreach (var savedPassword in savedPasswords)
         {
             var masterPasswordBytes = _accountService.GetMasterPasswordKey(passwordHash);
-            using var aes = Aes.Create();
-            var ivBytes = aes.IV;
-            savedPassword.Password = _cryptoService.Encrypt(savedPassword.Password, masterPasswordBytes, ivBytes);
+            savedPassword.Password = _cryptoService.Encrypt(savedPassword.Password, masterPasswordBytes, out var ivBytes);
             savedPassword.Iv = Convert.ToBase64String(ivBytes);
         }
 

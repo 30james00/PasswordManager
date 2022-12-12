@@ -1,6 +1,6 @@
-namespace PasswordManager.Application.Accounts.DTOs
+namespace PasswordManager.Application.Accounts.DAOs
 {
-    public class AccountDto
+    public class AccountDao
     {
         public string Login { get; set; } = null!;
         public string Token { get; set; } = null!;

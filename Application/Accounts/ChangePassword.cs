@@ -3,14 +3,14 @@ using System.Security.Cryptography;
 using Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using PasswordManager.Application.Accounts.DTOs;
+using PasswordManager.Application.Accounts.DAOs;
 using PasswordManager.Application.Core;
 using PasswordManager.Application.Security.Crypto;
 using PasswordManager.Application.Security.Token;
 
 namespace PasswordManager.Application.Accounts;
 
-public class ChangePasswordCommand : IRequest<ApiResult<AccountDto>>
+public class ChangePasswordCommand : IRequest<ApiResult<AccountDao>>
 {
     [Required]
     [RegularExpression("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$")]
@@ -23,7 +23,7 @@ public class ChangePasswordCommand : IRequest<ApiResult<AccountDto>>
     [Required] public bool IsPasswordKeptAsHash { get; set; }
 }
 
-public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordCommand, ApiResult<AccountDto>>
+public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordCommand, ApiResult<AccountDao>>
 {
     private readonly DataContext _dataContext;
     private readonly IUserAccessor _userAccessor;
@@ -42,15 +42,15 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
         _tokenService = tokenService;
     }
 
-    public async Task<ApiResult<AccountDto>> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResult<AccountDao>> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
     {
         var userId = _userAccessor.GetUserId();
-        if (userId == null) return ApiResult<AccountDto>.Forbidden();
+        if (userId == null) return ApiResult<AccountDao>.Forbidden();
         var account =
             await _dataContext.Accounts.FirstOrDefaultAsync(x => x.Id == Guid.Parse(userId), cancellationToken);
-        if (account == null) return ApiResult<AccountDto>.Forbidden();
+        if (account == null) return ApiResult<AccountDao>.Forbidden();
         var hash = _accountService.GetPasswordHash(request.OldPassword, account.Salt, account.IsPasswordKeptAsHash);
-        if (hash != account.PasswordHash) return ApiResult<AccountDto>.Forbidden();
+        if (hash != account.PasswordHash) return ApiResult<AccountDao>.Forbidden();
 
         // Generate new salt and passwordHash
         var salt = _accountService.GenerateSalt();
@@ -81,11 +81,11 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
 
         var result = await _dataContext.SaveChangesAsync(cancellationToken) > 0;
         return result
-            ? ApiResult<AccountDto>.Success(new AccountDto
+            ? ApiResult<AccountDao>.Success(new AccountDao
             {
                 Login = account.Login,
                 Token = _tokenService.CreateToken(account),
             })
-            : ApiResult<AccountDto>.Failure("Error saving new MasterPassword to Database");
+            : ApiResult<AccountDao>.Failure("Error saving new MasterPassword to Database");
     }
 }

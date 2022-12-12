@@ -7,7 +7,6 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Application.Accounts;
 using PasswordManager.Application.Core;
-using PasswordManager.Application.SavedPasswords.DTOs;
 using PasswordManager.Application.Security.Crypto;
 using PasswordManager.Application.Security.Token;
 

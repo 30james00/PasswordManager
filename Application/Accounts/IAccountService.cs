@@ -1,5 +1,3 @@
-using PasswordManager.Application.Accounts.DTOs;
-
 namespace PasswordManager.Application.Accounts;
 
 public interface IAccountService

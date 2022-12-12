@@ -8,15 +8,15 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Application.Accounts;
 using PasswordManager.Application.Core;
-using PasswordManager.Application.SavedPasswords.DTOs;
+using PasswordManager.Application.SavedPasswords.DAOs;
 using PasswordManager.Application.Security.Crypto;
 using PasswordManager.Application.Security.Token;
 
 namespace PasswordManager.Application.SavedPasswords;
 
-public record ListPasswordQuery() : IRequest<ApiResult<List<SavedPasswordDto>>>;
+public record ListPasswordQuery() : IRequest<ApiResult<List<SavedPasswordDao>>>;
 
-public class ListPasswordQueryHandler : IRequestHandler<ListPasswordQuery, ApiResult<List<SavedPasswordDto>>>
+public class ListPasswordQueryHandler : IRequestHandler<ListPasswordQuery, ApiResult<List<SavedPasswordDao>>>
 {
     private readonly DataContext _dataContext;
     private readonly IUserAccessor _userAccessor;
@@ -29,15 +29,15 @@ public class ListPasswordQueryHandler : IRequestHandler<ListPasswordQuery, ApiRe
         _mapper = mapper;
     }
 
-    public async Task<ApiResult<List<SavedPasswordDto>>> Handle(ListPasswordQuery request,
+    public async Task<ApiResult<List<SavedPasswordDao>>> Handle(ListPasswordQuery request,
         CancellationToken cancellationToken)
     {
         // Get Account
         var accountId = _userAccessor.GetUserId();
-        if (accountId == null) return ApiResult<List<SavedPasswordDto>>.Forbidden();
+        if (accountId == null) return ApiResult<List<SavedPasswordDao>>.Forbidden();
 
-        return ApiResult<List<SavedPasswordDto>>.Success(await _dataContext.SavedPasswords
+        return ApiResult<List<SavedPasswordDao>>.Success(await _dataContext.SavedPasswords
             .Where(x => x.AccountId == Guid.Parse(accountId))
-            .ProjectTo<SavedPasswordDto>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken));
+            .ProjectTo<SavedPasswordDao>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken));
     }
 }

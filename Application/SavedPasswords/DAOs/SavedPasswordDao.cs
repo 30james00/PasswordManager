@@ -1,6 +1,6 @@
-namespace PasswordManager.Application.SavedPasswords.DTOs;
+namespace PasswordManager.Application.SavedPasswords.DAOs;
 
-public class SavedPasswordDto
+public class SavedPasswordDao
 {
     public Guid Id { get; set; }
     public string WebAddress { get; set; } = null!;

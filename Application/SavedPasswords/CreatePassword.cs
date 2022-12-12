@@ -7,13 +7,13 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Application.Accounts;
 using PasswordManager.Application.Core;
-using PasswordManager.Application.SavedPasswords.DTOs;
+using PasswordManager.Application.SavedPasswords.DAOs;
 using PasswordManager.Application.Security.Crypto;
 using PasswordManager.Application.Security.Token;
 
 namespace PasswordManager.Application.SavedPasswords;
 
-public class CreatePasswordCommand : IRequest<ApiResult<SavedPasswordDto>>
+public class CreatePasswordCommand : IRequest<ApiResult<SavedPasswordDao>>
 {
     [Required] public string Password { get; set; } = null!;
     [Required] public string WebAddress { get; set; } = null!;
@@ -21,7 +21,7 @@ public class CreatePasswordCommand : IRequest<ApiResult<SavedPasswordDto>>
     public string? Login { get; set; }
 }
 
-public class CreatePasswordCommandHandler : IRequestHandler<CreatePasswordCommand, ApiResult<SavedPasswordDto>>
+public class CreatePasswordCommandHandler : IRequestHandler<CreatePasswordCommand, ApiResult<SavedPasswordDao>>
 {
     private readonly DataContext _dataContext;
     private readonly IUserAccessor _userAccessor;
@@ -39,15 +39,15 @@ public class CreatePasswordCommandHandler : IRequestHandler<CreatePasswordComman
         _mapper = mapper;
     }
 
-    public async Task<ApiResult<SavedPasswordDto>> Handle(CreatePasswordCommand request,
+    public async Task<ApiResult<SavedPasswordDao>> Handle(CreatePasswordCommand request,
         CancellationToken cancellationToken)
     {
         // Get Account
         var accountId = _userAccessor.GetUserId();
-        if (accountId == null) return ApiResult<SavedPasswordDto>.Forbidden();
+        if (accountId == null) return ApiResult<SavedPasswordDao>.Forbidden();
         var account =
             await _dataContext.Accounts.FirstOrDefaultAsync(x => x.Id == Guid.Parse(accountId), cancellationToken);
-        if (account == null) return ApiResult<SavedPasswordDto>.Forbidden();
+        if (account == null) return ApiResult<SavedPasswordDao>.Forbidden();
 
         //Create key for password encryption using MasterPassword hash
         var key = _accountService.GetMasterPasswordKey(account.PasswordHash);
@@ -66,7 +66,7 @@ public class CreatePasswordCommandHandler : IRequestHandler<CreatePasswordComman
         await _dataContext.SavedPasswords.AddAsync(savedPassword, cancellationToken);
         var result = await _dataContext.SaveChangesAsync(cancellationToken) > 0;
         return result
-            ? ApiResult<SavedPasswordDto>.Success(_mapper.Map<SavedPassword, SavedPasswordDto>(savedPassword))
-            : ApiResult<SavedPasswordDto>.Failure("Error saving new Password to Database");
+            ? ApiResult<SavedPasswordDao>.Success(_mapper.Map<SavedPassword, SavedPasswordDao>(savedPassword))
+            : ApiResult<SavedPasswordDao>.Failure("Error saving new Password to Database");
     }
 }

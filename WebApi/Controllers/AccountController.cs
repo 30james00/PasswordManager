@@ -2,7 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Accounts;
-using PasswordManager.Application.Accounts.DTOs;
+using PasswordManager.Application.Accounts.DAOs;
 using PasswordManager.Application.Security.Token;
 
 namespace PasswordManager.Controllers;
@@ -15,21 +15,21 @@ public class AccountController : BaseApiController
     
     [AllowAnonymous]
     [HttpPost("login")]
-    public async Task<ActionResult<AccountDto>> Login(LoginQuery loginQuery)
+    public async Task<ActionResult<AccountDao>> Login(LoginQuery loginQuery)
     {
         return HandleResult(await _mediator.Send(loginQuery));
     }
 
     [AllowAnonymous]
     [HttpPost("register")]
-    public async Task<ActionResult<AccountDto>> Register(CreateAccountCommand createAccountCommand)
+    public async Task<ActionResult<AccountDao>> Register(CreateAccountCommand createAccountCommand)
     {
         return HandleResult(await _mediator.Send(createAccountCommand));
     }
 
     [Authorize]
     [HttpPatch("change-password")]
-    public async Task<ActionResult<AccountDto>> ChangePassword(ChangePasswordCommand changePasswordCommand)
+    public async Task<ActionResult<AccountDao>> ChangePassword(ChangePasswordCommand changePasswordCommand)
     {
         return HandleResult(await _mediator.Send(changePasswordCommand));
     }

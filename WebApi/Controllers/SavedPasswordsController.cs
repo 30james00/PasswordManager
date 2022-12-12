@@ -2,7 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.SavedPasswords;
-using PasswordManager.Application.SavedPasswords.DTOs;
+using PasswordManager.Application.SavedPasswords.DAOs;
 
 namespace PasswordManager.Controllers;
 
@@ -14,28 +14,28 @@ public class SavedPasswordsController : BaseApiController
     
     [Authorize]
     [HttpGet]
-    public async Task<ActionResult<List<SavedPasswordDto>>> ListPasswords()
+    public async Task<ActionResult<List<SavedPasswordDao>>> ListPasswords()
     {
         return HandleResult(await _mediator.Send(new ListPasswordQuery()));
     }
 
     [Authorize]
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<List<SavedPasswordDto>>> DetailPassword(Guid id)
+    public async Task<ActionResult<List<SavedPasswordDao>>> DetailPassword(Guid id)
     {
         return HandleResult(await _mediator.Send(new DetailPasswordQuery(id)));
     }
 
     [Authorize]
     [HttpPost]
-    public async Task<ActionResult<SavedPasswordDto>> CreatePassword(CreatePasswordCommand command)
+    public async Task<ActionResult<SavedPasswordDao>> CreatePassword(CreatePasswordCommand command)
     {
         return HandleResult(await _mediator.Send(command));
     }
 
     [Authorize]
     [HttpPatch]
-    public async Task<ActionResult<SavedPasswordDto>> EditPassword(EditPasswordCommand command)
+    public async Task<ActionResult<SavedPasswordDao>> EditPassword(EditPasswordCommand command)
     {
         return HandleResult(await _mediator.Send(command));
     }

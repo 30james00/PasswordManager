@@ -1,5 +1,4 @@
 using System.Text;
-using Application;
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Application.Security.Hash;
 using PasswordManager.Application.Security.Token;
@@ -11,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using PasswordManager.Application;
 using PasswordManager.Application.Core;
 using PasswordManager.Application.Security.Crypto;
 using PasswordManager.Middleware;

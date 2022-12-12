@@ -9,4 +9,5 @@ public class Account
     public bool IsPasswordKeptAsHash { get; set; }
     public List<SavedPassword> SavedPasswords { get; set; } = new List<SavedPassword>();
     public List<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+    public List<LoginAttempt> LoginAttempts { get; set; } = new List<LoginAttempt>();
 }

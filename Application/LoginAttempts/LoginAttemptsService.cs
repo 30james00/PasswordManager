@@ -1,26 +1,23 @@
 using Domain;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using PasswordManager.Application.Security.Token;
 
 namespace PasswordManager.Application.LoginAttempts;
 
 public class LoginAttemptsService : ILoginAttemptsService
 {
     private readonly DataContext _context;
-    private readonly Guid _accountId;
 
-    public LoginAttemptsService(DataContext context, Guid accountId)
+    public LoginAttemptsService(DataContext context)
     {
         _context = context;
-        _accountId = accountId;
     }
 
-    public async Task LogLoginAttempt(bool isSuccessful, string ipAddress)
+    public async Task LogLoginAttempt(Guid accountId, bool isSuccessful, string ipAddress)
     {
         await _context.LoginAttempts.AddAsync(new LoginAttempt
         {
-            AccountId = _accountId,
+            AccountId = accountId,
             Time = new DateTime(),
             IpAddress = ipAddress,
             IsSuccessful = isSuccessful,
@@ -28,25 +25,85 @@ public class LoginAttemptsService : ILoginAttemptsService
         await _context.SaveChangesAsync();
     }
 
-    public DateTime? LastSuccessfulLoginAttemptTime()
+    public async Task<DateTime?> LastSuccessfulLoginAttemptTime(Guid accountId)
     {
-        return _context.LoginAttempts.Where(x=> x.AccountId == _accountId && x.IsSuccessful == true).OrderByDescending(x => x.Time).FirstOrDefault()
+        return (await _context.LoginAttempts.Where(x => x.AccountId == accountId && x.IsSuccessful == true)
+            .OrderByDescending(x => x.Time).FirstOrDefaultAsync())
             ?.Time;
     }
 
-    public DateTime? LastUnsuccessfulLoginAttemptTime()
+    public async Task<DateTime?> LastUnsuccessfulLoginAttemptTime(Guid accountId)
     {
-        return _context.LoginAttempts.Where(x => x.AccountId == _accountId && x.IsSuccessful == false).OrderByDescending(x => x.Time).FirstOrDefault()
+        return (await _context.LoginAttempts.Where(x => x.AccountId == accountId && x.IsSuccessful == false)
+            .OrderByDescending(x => x.Time).FirstOrDefaultAsync())
             ?.Time;
     }
 
-    public void ThrottleLogIn()
+    public async Task<int> ThrottleLogInTime(Guid accountId)
     {
-        throw new NotImplementedException();
+        var attempts = await _context.LoginAttempts.Where(x => x.AccountId == accountId).OrderByDescending(x => x.Time)
+            .ToListAsync();
+        var unsuccessfulAttempts = 0;
+
+        foreach (var attempt in attempts)
+        {
+            if (attempt.IsSuccessful == false) unsuccessfulAttempts++;
+            else break;
+        }
+
+        switch (unsuccessfulAttempts)
+        {
+            case >= 4:
+                return 120000;
+            case 3:
+                return 10000;
+            case 2:
+                return 5000;
+        }
+
+        return 0;
     }
 
-    public void ResetLocks()
+    public async Task<int> ThrottleIpLogIn(Guid accountId, string ipAddress)
     {
-        throw new NotImplementedException();
+        var block = await _context.IpAddressBlocks.FirstOrDefaultAsync(x =>
+            x.IpAddress == ipAddress && x.AccountId == accountId);
+        if (block != null) return int.MaxValue;
+
+        var attempts = await _context.LoginAttempts.Where(x => x.IpAddress == ipAddress).OrderByDescending(x => x.Time)
+            .ToListAsync();
+        var unsuccessfulAttempts = 0;
+
+        foreach (var attempt in attempts)
+        {
+            if (attempt.IsSuccessful == false) unsuccessfulAttempts++;
+            else break;
+        }
+
+        switch (unsuccessfulAttempts)
+        {
+            case >= 4:
+                await _context.IpAddressBlocks.AddAsync(new IpAddressBlock
+                    { IpAddress = ipAddress, AccountId = accountId });
+                await _context.SaveChangesAsync();
+                return int.MaxValue;
+            case 3:
+                return 10000;
+            case 2:
+                return 5000;
+        }
+
+        return 0;
+    }
+
+    public async Task UnlockIpAddress(Guid accountId, string ipAddress)
+    {
+        var block = await _context.IpAddressBlocks.FirstOrDefaultAsync(x =>
+            x.IpAddress == ipAddress && x.AccountId == accountId);
+        if (block != null)
+        {
+            _context.IpAddressBlocks.Remove(block);
+            await _context.SaveChangesAsync();
+        }
     }
 }

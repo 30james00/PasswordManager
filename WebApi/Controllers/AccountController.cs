@@ -12,7 +12,7 @@ public class AccountController : BaseApiController
     public AccountController(IMediator mediator) : base(mediator)
     {
     }
-    
+
     [AllowAnonymous]
     [HttpPost("login")]
     public async Task<ActionResult<AccountDao>> Login(LoginQuery loginQuery)
@@ -32,5 +32,19 @@ public class AccountController : BaseApiController
     public async Task<ActionResult<AccountDao>> ChangePassword(ChangePasswordCommand changePasswordCommand)
     {
         return HandleResult(await _mediator.Send(changePasswordCommand));
+    }
+
+    [Authorize]
+    [HttpGet("login-stats")]
+    public async Task<ActionResult<string>> LoginStats()
+    {
+        return HandleResult(await _mediator.Send(new AccountStatsQuery()));
+    }
+
+    [Authorize]
+    [HttpDelete("ip-block")]
+    public async Task<ActionResult<Unit>> RemoveIpBlock(UnblockIpAddressCommand unblockIpAddressCommand)
+    {
+        return HandleResult(await _mediator.Send(unblockIpAddressCommand));
     }
 }

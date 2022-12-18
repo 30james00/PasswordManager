@@ -20,5 +20,10 @@ namespace PasswordManager.Application.Security.Token
         {
             return _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
+
+        public string GetRequestIpAddress()
+        {
+            return _httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString();
+        }
     }
 }

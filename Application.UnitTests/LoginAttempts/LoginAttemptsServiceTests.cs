@@ -3,12 +3,9 @@ using System.Threading.Tasks;
 using Domain;
 using FluentAssertions;
 using FluentAssertions.Extensions;
-using Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using NUnit.Framework;
 using PasswordManager.Application.LoginAttempts;
-using PasswordManager.Application.Security.Token;
 using DataContext = Infrastructure.DataContext;
 
 namespace Application.UnitTests.LoginAttempts;
@@ -40,18 +37,18 @@ public class LoginAttemptsServiceTests
                 $"{Guid.NewGuid()}")
             .Options;
 
-        using (var context = new DataContext(options))
+        await using (var context = new DataContext(options))
         {
             context.Accounts.Add(new Account
                 { Id = _accountId, Login = "test", PasswordHash = "test", Salt = "test" });
             context.SaveChanges();
         }
 
-        using (var context = new DataContext(options))
+        await using (var context = new DataContext(options))
         {
-            var service = new LoginAttemptsService(context, _accountId);
+            var service = new LoginAttemptsService(context);
 
-            service.LogLoginAttempt(isSuccessful, _ipAddress);
+            await service.LogLoginAttempt(_accountId, isSuccessful, _ipAddress);
 
             // Use a clean instance of the context to run the test
             var loginAttempt = await context.LoginAttempts.FirstOrDefaultAsync();
@@ -70,7 +67,7 @@ public class LoginAttemptsServiceTests
                 $"{Guid.NewGuid()}")
             .Options;
 
-        using (var context = new DataContext(options))
+        await using (var context = new DataContext(options))
         {
             await context.LoginAttempts.AddAsync(new LoginAttempt
             {
@@ -89,11 +86,11 @@ public class LoginAttemptsServiceTests
             await context.SaveChangesAsync();
         }
 
-        using (var context = new DataContext(options))
+        await using (var context = new DataContext(options))
         {
-            var service = new LoginAttemptsService(context, _accountId);
+            var service = new LoginAttemptsService(context);
 
-            var lastSuccessfulLogin = service.LastSuccessfulLoginAttemptTime();
+            var lastSuccessfulLogin = await service.LastSuccessfulLoginAttemptTime(_accountId);
 
             // Use a clean instance of the context to run the test
             lastSuccessfulLogin.Should().BeWithin(3.Seconds());
@@ -108,17 +105,17 @@ public class LoginAttemptsServiceTests
                 $"{Guid.NewGuid()}")
             .Options;
 
-        using (var context = new DataContext(options))
+        await using (var context = new DataContext(options))
         {
-            var service = new LoginAttemptsService(context, _accountId);
+            var service = new LoginAttemptsService(context);
 
-            var lastSuccessfulLogin = service.LastSuccessfulLoginAttemptTime();
+            var lastSuccessfulLogin = await service.LastSuccessfulLoginAttemptTime(_accountId);
 
             // Use a clean instance of the context to run the test
             lastSuccessfulLogin.Should().BeNull();
         }
-    } 
-    
+    }
+
     [Test]
     public async Task LastUnsuccessfulLoginAttemptTime_Exists_DataTime()
     {
@@ -127,7 +124,7 @@ public class LoginAttemptsServiceTests
                 $"{Guid.NewGuid()}")
             .Options;
 
-        using (var context = new DataContext(options))
+        await using (var context = new DataContext(options))
         {
             await context.LoginAttempts.AddAsync(new LoginAttempt
             {
@@ -146,14 +143,14 @@ public class LoginAttemptsServiceTests
             await context.SaveChangesAsync();
         }
 
-        using (var context = new DataContext(options))
+        await using (var context = new DataContext(options))
         {
-            var service = new LoginAttemptsService(context, _accountId);
+            var service = new LoginAttemptsService(context);
 
-            var lastSuccessfulLogin = service.LastUnsuccessfulLoginAttemptTime();
+            var lastUnsuccessfulLoginAttemptTime = await service.LastUnsuccessfulLoginAttemptTime(_accountId);
 
             // Use a clean instance of the context to run the test
-            lastSuccessfulLogin.Should().BeWithin(3.Seconds());
+            lastUnsuccessfulLoginAttemptTime.Should().BeWithin(3.Seconds());
         }
     }
 
@@ -165,14 +162,180 @@ public class LoginAttemptsServiceTests
                 $"{Guid.NewGuid()}")
             .Options;
 
-        using (var context = new DataContext(options))
+        await using (var context = new DataContext(options))
         {
-            var service = new LoginAttemptsService(context, _accountId);
+            var service = new LoginAttemptsService(context);
 
-            var lastSuccessfulLogin = service.LastSuccessfulLoginAttemptTime();
+            var lastUnsuccessfulLogin = await service.LastSuccessfulLoginAttemptTime(_accountId);
 
             // Use a clean instance of the context to run the test
-            lastSuccessfulLogin.Should().BeNull();
+            lastUnsuccessfulLogin.Should().BeNull();
+        }
+    }
+
+    [TestCase(1, 0)]
+    [TestCase(2, 5000)]
+    [TestCase(3, 10000)]
+    [TestCase(4, 120000)]
+    [TestCase(5, 120000)]
+    public async Task ThrottleLogIn_UnsuccessfulLoginAttempts_XSecLockout(int attemptsNumber, int lockoutTime)
+    {
+        var options = new DbContextOptionsBuilder<DataContext>()
+            .UseInMemoryDatabase(
+                $"{Guid.NewGuid()}")
+            .Options;
+
+        await using (var context = new DataContext(options))
+        {
+            for (int i = 0; i < attemptsNumber; i++)
+            {
+                await context.LoginAttempts.AddAsync(new LoginAttempt
+                {
+                    AccountId = _accountId,
+                    IpAddress = _ipAddress,
+                    IsSuccessful = false,
+                    Time = DateTime.Now.Subtract(TimeSpan.FromDays(1))
+                });
+            }
+
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = new DataContext(options))
+        {
+            var service = new LoginAttemptsService(context);
+
+            var time = service.ThrottleLogInTime(_accountId);
+
+            time.Should().Be(lockoutTime);
+        }
+    }
+
+    [TestCase(1, 0)]
+    [TestCase(2, 5000)]
+    [TestCase(3, 10000)]
+    [TestCase(4, int.MaxValue)]
+    [TestCase(5, int.MaxValue)]
+    public async Task ThrottleIpLogIn_NotBlockedIp_XSecLockout(int attemptsNumber, int lockoutTime)
+    {
+        var options = new DbContextOptionsBuilder<DataContext>()
+            .UseInMemoryDatabase(
+                $"{Guid.NewGuid()}")
+            .Options;
+
+        await using (var context = new DataContext(options))
+        {
+            for (int i = 0; i < attemptsNumber; i++)
+            {
+                await context.LoginAttempts.AddAsync(new LoginAttempt
+                {
+                    AccountId = _accountId,
+                    IpAddress = _ipAddress,
+                    IsSuccessful = false,
+                    Time = DateTime.Now.Subtract(TimeSpan.FromDays(1))
+                });
+            }
+
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = new DataContext(options))
+        {
+            var service = new LoginAttemptsService(context);
+
+            var time = await service.ThrottleIpLogIn(_accountId, _ipAddress);
+
+            time.Should().Be(lockoutTime);
+        }
+    }
+
+    [Test]
+    public async Task ThrottleIpLogInBlockedIp_PermanentBlock_MaxInt()
+    {
+        var options = new DbContextOptionsBuilder<DataContext>()
+            .UseInMemoryDatabase(
+                $"{Guid.NewGuid()}")
+            .Options;
+
+        await using (var context = new DataContext(options))
+        {
+            await context.IpAddressBlocks.AddAsync(new IpAddressBlock
+            {
+                AccountId = _accountId,
+                IpAddress = _ipAddress,
+            });
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = new DataContext(options))
+        {
+            var service = new LoginAttemptsService(context);
+
+            var time = await service.ThrottleIpLogIn(_accountId, _ipAddress);
+
+            time.Should().Be(int.MaxValue);
+        }
+    }
+
+    [Test]
+    public async Task ThrottleIpLogInBlockedIp_4UnsuccessfulAttempts_BlockIP()
+    {
+        var options = new DbContextOptionsBuilder<DataContext>()
+            .UseInMemoryDatabase(
+                $"{Guid.NewGuid()}")
+            .Options;
+
+        await using (var context = new DataContext(options))
+        {
+            await context.IpAddressBlocks.AddAsync(new IpAddressBlock
+            {
+                AccountId = _accountId,
+                IpAddress = _ipAddress,
+            });
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = new DataContext(options))
+        {
+            var service = new LoginAttemptsService(context);
+
+            var time = await service.ThrottleIpLogIn(_accountId, _ipAddress);
+            var block = await context.IpAddressBlocks.FirstOrDefaultAsync(x =>
+                x.IpAddress == _ipAddress && x.AccountId == _accountId);
+
+            time.Should().Be(int.MaxValue);
+            block.IpAddress.Should().Be(_ipAddress);
+            block.AccountId.Should().Be(_accountId);
+        }
+    }
+
+    [Test]
+    public async Task UnblockIpAddress_BlockedIpAddress_Unblock()
+    {
+        var options = new DbContextOptionsBuilder<DataContext>()
+            .UseInMemoryDatabase(
+                $"{Guid.NewGuid()}")
+            .Options;
+
+        await using (var context = new DataContext(options))
+        {
+            await context.IpAddressBlocks.AddAsync(new IpAddressBlock
+            {
+                AccountId = _accountId,
+                IpAddress = _ipAddress,
+            });
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = new DataContext(options))
+        {
+            var service = new LoginAttemptsService(context);
+
+            await service.UnlockIpAddress(_accountId, _ipAddress);
+            var block = await context.IpAddressBlocks.FirstOrDefaultAsync(x =>
+                x.IpAddress == _ipAddress && x.AccountId == _accountId);
+
+            block.Should().BeNull();
         }
     }
 }

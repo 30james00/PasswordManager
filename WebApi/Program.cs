@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using PasswordManager.Application;
 using PasswordManager.Application.Core;
+using PasswordManager.Application.LoginAttempts;
 using PasswordManager.Application.Security.Crypto;
 using PasswordManager.Middleware;
 
@@ -40,6 +41,7 @@ builder.Services.AddTransient<IHashService, HashService>();
 builder.Services.AddTransient<ICryptoService, CryptoService>();
 
 builder.Services.AddScoped<IUserAccessor, UserAccessor>();
+builder.Services.AddScoped<ILoginAttemptsService, LoginAttemptsService>();
 
 builder.Services.AddControllers(opt =>
 {

@@ -50,7 +50,7 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, ApiResult<AccountDt
         {
             var lastUnsuccessfulDateTime =
                 await _loginAttemptsService.LastUnsuccessfulLoginAttemptTime(account.Id) ?? DateTime.Now;
-            var blockTimeDelta = DateTime.Now.Subtract(lastUnsuccessfulDateTime).Seconds;
+            var blockTimeDelta = DateTime.Now.Subtract(lastUnsuccessfulDateTime).TotalSeconds;
             if (blockTimeDelta < blockTime)
                 return ApiResult<AccountDto>.Forbidden(
                     $"Too many login attempts - account is locked for {blockTime - blockTimeDelta}s");

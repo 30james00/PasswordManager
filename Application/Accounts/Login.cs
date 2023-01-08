@@ -53,7 +53,7 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, ApiResult<AccountDt
             var blockTimeDelta = DateTime.Now.Subtract(lastUnsuccessfulDateTime).TotalSeconds;
             if (blockTimeDelta < blockTime)
                 return ApiResult<AccountDto>.Forbidden(
-                    $"Too many login attempts - account is locked for {blockTime - blockTimeDelta}s");
+                    $"Too many login attempts - account is locked for {(blockTime - blockTimeDelta):#.##} s");
         }
 
         var hash = _accountService.GetPasswordHash(request.Password, account.Salt,

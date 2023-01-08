@@ -36,10 +36,10 @@ public class AccountController : BaseApiController
     }
 
     [AllowAnonymous]
-    [HttpGet("login-stats")]
-    public async Task<ActionResult<string>> LoginStats(DetailAccountStatsQuery detailAccountStatsQuery)
+    [HttpGet("login-stats/{login}")]
+    public async Task<ActionResult<string>> LoginStats(string login)
     {
-        return HandleResult(await _mediator.Send(detailAccountStatsQuery));
+        return HandleResult(await _mediator.Send(new DetailAccountStatsQuery(login)));
     }
 
     [Authorize]

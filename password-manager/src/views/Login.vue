@@ -7,12 +7,12 @@ import { useToast } from 'vue-toastification';
 const toast = useToast();
 
 export default defineComponent({
-  name: "Login",
+  name: 'Login',
   data() {
     return {
       loginDto: {} as ILoginDto,
       accountStore: useAccountStore(),
-    }
+    };
   },
   methods: {
     async handleSubmit(): Promise<void> {
@@ -21,21 +21,43 @@ export default defineComponent({
         this.accountStore.login(response.data);
       } catch (e) {
         toast.error('Error logging in');
-        return;
+      } finally {
+        try {
+          let response = await this.$axios.get(
+            `/account/login-stats/${this.loginDto.login}`
+          );
+          toast.info(response.data);
+        } catch (error) {
+          toast.error('Error getting login info');
+        }
       }
-    }
-  }
+    },
+  },
 });
 </script>
 
 <template>
   <div :class="$style.component">
     <form v-on:submit.prevent="handleSubmit" :class="$style.form">
-      <input v-model="loginDto.login" required type="text" name="login" placeholder="Login">
-      <input v-model="loginDto.password" required type="password" name="password" placeholder="Password">
-      <input type="submit" name="submit" id="submit" value="Login">
+      <input
+        v-model="loginDto.login"
+        required
+        type="text"
+        name="login"
+        placeholder="Login"
+      />
+      <input
+        v-model="loginDto.password"
+        required
+        type="password"
+        name="password"
+        placeholder="Password"
+      />
+      <input type="submit" name="submit" id="submit" value="Login" />
     </form>
-    <RouterLink class="nav-link" :to="{ name: 'register' }">Register instead</RouterLink>
+    <RouterLink class="nav-link" :to="{ name: 'register' }"
+      >Register instead</RouterLink
+    >
   </div>
 </template>
 

@@ -1,6 +1,5 @@
 <script lang="ts">
 import { defineComponent } from '@vue/runtime-dom';
-import type { ISavedPassword } from '@/models/savedPasswordModels';
 import { useToast } from 'vue-toastification';
 import CustomButton from '@/components/CustomButton.vue';
 import CustomIconButton from '@/components/CustomIconButton.vue';

@@ -16,7 +16,7 @@ export default defineComponent({
   <div :class="$style.outer">
     <div :class="$style.inner">
       <font-awesome-icon :class="$style.icon" icon="fa-solid fa-user" />
-      <RouterLink :class="$style.text" :to="{ name: accountStore.isLoggedIn ? 'change-password' : 'login' }">{{
+      <RouterLink :class="$style.text" :to="{ name: accountStore.isLoggedIn ? 'account' : 'login' }">{{
           accountStore.isLoggedIn ?
             accountStore.account!.login : "Login"
       }}</RouterLink>
@@ -39,6 +39,7 @@ export default defineComponent({
 .inner {
   @include row;
   align-items: center;
+  padding-bottom: .25em;
 }
 
 .text {

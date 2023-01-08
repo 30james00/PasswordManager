@@ -1,4 +1,4 @@
-namespace Application
+namespace PasswordManager.Application
 {
     public class MediatREntrypoint
     {

@@ -1,10 +1,10 @@
 import { useAccountStore } from '@/stores/accountStore';
-import ChangePassword from '@/views/ChangePassword.vue';
 import EditPassword from '@/views/EditPassword.vue';
 import CreatePassword from '@/views/CreatePassword.vue';
 import Login from '@/views/Login.vue';
 import Register from '@/views/Register.vue';
 import SavedPasswordList from '@/views/SavedPasswordList.vue';
+import AccountDetails from '@/views/AccountDetails.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
@@ -21,9 +21,9 @@ const router = createRouter({
       component: Login,
     },
     {
-      path: '/change-password',
-      name: 'change-password',
-      component: ChangePassword,
+      path: '/account',
+      name: 'account',
+      component: AccountDetails,
     },
     {
       path: '/',

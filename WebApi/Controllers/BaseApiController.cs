@@ -18,7 +18,7 @@ namespace PasswordManager.Controllers
         protected ActionResult HandleResult<T>(ApiResult<T>? result)
         {
             if (result == null) return NotFound();
-            if (result.IsForbidden) return Forbid();
+            if (result.IsForbidden) return new ObjectResult(result.Error) { StatusCode = 403};
             if (result.IsSuccess && result.Value != null) return Ok(result.Value);
             if (result.IsSuccess && result.Value == null) return NotFound();
             return BadRequest(result.Error);

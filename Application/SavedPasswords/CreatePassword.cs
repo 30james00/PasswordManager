@@ -54,7 +54,6 @@ public class CreatePasswordCommandHandler : IRequestHandler<CreatePasswordComman
         var savedPassword = new SavedPassword
         {
             // Encrypt password
-            // TODO: add out parameter to remove need of redundant aes creation
             Password = _cryptoService.Encrypt(request.Password, key, out var ivBytes),
             WebAddress = request.WebAddress,
             Description = request.Description,

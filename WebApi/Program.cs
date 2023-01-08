@@ -1,5 +1,4 @@
 using System.Text;
-using Application;
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Application.Security.Hash;
 using PasswordManager.Application.Security.Token;
@@ -11,7 +10,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using PasswordManager.Application;
 using PasswordManager.Application.Core;
+using PasswordManager.Application.LoginAttempts;
 using PasswordManager.Application.Security.Crypto;
 using PasswordManager.Middleware;
 
@@ -40,6 +41,7 @@ builder.Services.AddTransient<IHashService, HashService>();
 builder.Services.AddTransient<ICryptoService, CryptoService>();
 
 builder.Services.AddScoped<IUserAccessor, UserAccessor>();
+builder.Services.AddScoped<ILoginAttemptsService, LoginAttemptsService>();
 
 builder.Services.AddControllers(opt =>
 {
@@ -90,7 +92,7 @@ builder.Services.AddDbContext<DataContext>(options =>
     // Configure SQLite database
     options.UseSqlite(builder.Configuration.GetConnectionString("SQLite")));
 
-var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenKey"]));
+var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenKey"] ?? throw new InvalidOperationException()));
 
 //Configure Authentication and add Authorization
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

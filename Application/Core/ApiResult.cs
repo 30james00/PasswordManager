@@ -13,6 +13,7 @@ namespace PasswordManager.Application.Core
         public static ApiResult<T> Failure(string error) => new ApiResult<T>
             { IsSuccess = false, IsForbidden = false, Error = error };
 
-        public static ApiResult<T> Forbidden() => new ApiResult<T> { IsForbidden = true, IsSuccess = false };
+        public static ApiResult<T> Forbidden(string error = "Forbidden") => new ApiResult<T>
+            { IsForbidden = true, IsSuccess = false, Error = error };
     }
 }

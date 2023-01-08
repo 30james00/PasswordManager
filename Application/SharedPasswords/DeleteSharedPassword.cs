@@ -7,14 +7,14 @@ using PasswordManager.Application.Security.Token;
 
 namespace PasswordManager.Application.SharedPasswords;
 
-public record CreateSharedPasswordCommand(Guid Id, string Login) : IRequest<ApiResult<Unit>>;
+public record DeleteSharedPasswordCommand(Guid Id, string Login) : IRequest<ApiResult<Unit>>;
 
-public class CreateSharedPasswordCommandHandler : IRequestHandler<CreateSharedPasswordCommand, ApiResult<Unit>>
+public class DeleteSharedPasswordCommandHandler : IRequestHandler<CreateSharedPasswordCommand, ApiResult<Unit>>
 {
     private readonly DataContext _dataContext;
     private readonly IUserAccessor _userAccessor;
 
-    public CreateSharedPasswordCommandHandler(DataContext dataContext, IUserAccessor userAccessor)
+    public DeleteSharedPasswordCommandHandler(DataContext dataContext, IUserAccessor userAccessor)
     {
         _dataContext = dataContext;
         _userAccessor = userAccessor;
@@ -29,30 +29,22 @@ public class CreateSharedPasswordCommandHandler : IRequestHandler<CreateSharedPa
             await _dataContext.Accounts.FirstOrDefaultAsync(x => x.Id == Guid.Parse(accountId), cancellationToken);
         if (owner == null) return ApiResult<Unit>.Forbidden();
 
-        // Get SavedPassword
-        var savedPassword =
-            await _dataContext.SavedPasswords.Include(x => x.Account)
-                .FirstOrDefaultAsync(x => x.Id == request.Id,
-                    cancellationToken);
-        if (savedPassword == null) return ApiResult<Unit>.Failure("SavedPassword does not exist");
-
-        // Authorize owner of Password
-        if (owner.Id != savedPassword.AccountId) return ApiResult<Unit>.Forbidden();
-
+        // Find user to share password
         var toAccount =
             await _dataContext.Accounts.FirstOrDefaultAsync(x => x.Login == request.Login, cancellationToken);
         if (toAccount == null) return ApiResult<Unit>.Failure("User does not exist");
 
-        // Check if already shared
-        if (owner.SavedPasswords.Any(x => x.Id == request.Id && x.Account.Login == request.Login))
-            return ApiResult<Unit>.Failure("Password already shared with this user");
+        // Get SharedPassword
+        var sharedPassword =
+            await _dataContext.SharedPasswords.Include(x => x.Account).FirstOrDefaultAsync(
+                x => x.SavedPasswordId == request.Id && x.AccountId == toAccount.Id, cancellationToken);
+        if (sharedPassword == null) return ApiResult<Unit>.Failure("Shared Password does not exist");
+
+        // Authorize owner of Password
+        if (owner.Id != sharedPassword.Account.Id) return ApiResult<Unit>.Forbidden();
 
         // Save to Database
-        await _dataContext.SharedPasswords.AddAsync(new SharedPassword
-        {
-            AccountId = toAccount.Id,
-            SavedPasswordId = savedPassword.Id,
-        }, cancellationToken);
+        _dataContext.SharedPasswords.Remove(sharedPassword);
         var result = await _dataContext.SaveChangesAsync(cancellationToken) > 0;
         return result ? ApiResult<Unit>.Success(Unit.Value) : ApiResult<Unit>.Failure("Error sharing password");
     }

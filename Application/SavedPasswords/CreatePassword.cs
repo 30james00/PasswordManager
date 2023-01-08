@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Security.Cryptography;
 using AutoMapper;
 using Domain;
 using Infrastructure;

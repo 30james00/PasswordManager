@@ -42,7 +42,7 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, ApiResult<AccountDt
         if (blockIpAddressTime == int.MaxValue)
         {
             await _loginAttemptsService.LogLoginAttempt(account.Id, false, ipAddress);
-            return ApiResult<AccountDto>.Forbidden();
+            return ApiResult<AccountDto>.Forbidden("Your IP address is blocked");
         }
 
         var blockTime = blockIpAddressTime > blockLogInTime ? blockIpAddressTime : blockLogInTime;

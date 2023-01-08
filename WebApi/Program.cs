@@ -92,7 +92,7 @@ builder.Services.AddDbContext<DataContext>(options =>
     // Configure SQLite database
     options.UseSqlite(builder.Configuration.GetConnectionString("SQLite")));
 
-var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenKey"]));
+var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenKey"] ?? throw new InvalidOperationException()));
 
 //Configure Authentication and add Authorization
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

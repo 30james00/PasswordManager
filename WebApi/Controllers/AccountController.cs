@@ -2,8 +2,9 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Accounts;
-using PasswordManager.Application.Accounts.DAOs;
-using PasswordManager.Application.Security.Token;
+using PasswordManager.Application.Accounts.DTOs;
+using PasswordManager.Application.IpAddressBlocks;
+using PasswordManager.Application.LoginAttempts.DTOs;
 
 namespace PasswordManager.Controllers;
 
@@ -15,30 +16,38 @@ public class AccountController : BaseApiController
 
     [AllowAnonymous]
     [HttpPost("login")]
-    public async Task<ActionResult<AccountDao>> Login(LoginQuery loginQuery)
+    public async Task<ActionResult<AccountDto>> Login(LoginQuery loginQuery)
     {
         return HandleResult(await _mediator.Send(loginQuery));
     }
 
     [AllowAnonymous]
     [HttpPost("register")]
-    public async Task<ActionResult<AccountDao>> Register(CreateAccountCommand createAccountCommand)
+    public async Task<ActionResult<AccountDto>> Register(CreateAccountCommand createAccountCommand)
     {
         return HandleResult(await _mediator.Send(createAccountCommand));
     }
 
     [Authorize]
     [HttpPatch("change-password")]
-    public async Task<ActionResult<AccountDao>> ChangePassword(ChangePasswordCommand changePasswordCommand)
+    public async Task<ActionResult<AccountDto>> ChangePassword(ChangePasswordCommand changePasswordCommand)
     {
         return HandleResult(await _mediator.Send(changePasswordCommand));
     }
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpGet("login-stats")]
-    public async Task<ActionResult<string>> LoginStats()
+    public async Task<ActionResult<string>> LoginStats(DetailAccountStatsQuery detailAccountStatsQuery)
     {
-        return HandleResult(await _mediator.Send(new AccountStatsQuery()));
+        return HandleResult(await _mediator.Send(detailAccountStatsQuery));
+    }
+
+    [Authorize]
+    [HttpGet("ip-block")]
+    public async Task<ActionResult<List<IpAddressBlockDto>>> ListIpAddressBlocks(
+        ListIpAddressBlocksQuery listIpAddressBlocksQuery)
+    {
+        return HandleResult(await _mediator.Send(listIpAddressBlocksQuery));
     }
 
     [Authorize]

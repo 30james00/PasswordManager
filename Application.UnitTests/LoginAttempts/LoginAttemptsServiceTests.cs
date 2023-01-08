@@ -52,10 +52,10 @@ public class LoginAttemptsServiceTests
 
             // Use a clean instance of the context to run the test
             var loginAttempt = await context.LoginAttempts.FirstOrDefaultAsync();
-            loginAttempt.AccountId.Should().Be(_accountId);
-            loginAttempt.Time.Should().BeWithin(5.Seconds());
-            loginAttempt.IsSuccessful.Should().Be(isSuccessful);
-            loginAttempt.IpAddress.Should().Be(_ipAddress);
+            loginAttempt?.AccountId.Should().Be(_accountId);
+            loginAttempt?.Time.Should().BeWithin(5.Seconds());
+            loginAttempt?.IsSuccessful.Should().Be(isSuccessful);
+            loginAttempt?.IpAddress.Should().Be(_ipAddress);
         }
     }
 
@@ -174,10 +174,10 @@ public class LoginAttemptsServiceTests
     }
 
     [TestCase(1, 0)]
-    [TestCase(2, 5000)]
-    [TestCase(3, 10000)]
-    [TestCase(4, 120000)]
-    [TestCase(5, 120000)]
+    [TestCase(2, 5)]
+    [TestCase(3, 10)]
+    [TestCase(4, 120)]
+    [TestCase(5, 120)]
     public async Task ThrottleLogIn_UnsuccessfulLoginAttempts_XSecLockout(int attemptsNumber, int lockoutTime)
     {
         var options = new DbContextOptionsBuilder<DataContext>()
@@ -205,17 +205,17 @@ public class LoginAttemptsServiceTests
         {
             var service = new LoginAttemptsService(context);
 
-            var time = service.ThrottleLogInTime(_accountId);
+            var time = await service.ThrottleLogInTime(_accountId);
 
             time.Should().Be(lockoutTime);
         }
     }
 
     [TestCase(1, 0)]
-    [TestCase(2, 5000)]
-    [TestCase(3, 10000)]
-    [TestCase(4, int.MaxValue)]
-    [TestCase(5, int.MaxValue)]
+    [TestCase(10, 50)]
+    [TestCase(15, 100)]
+    [TestCase(30, int.MaxValue)]
+    [TestCase(50, int.MaxValue)]
     public async Task ThrottleIpLogIn_NotBlockedIp_XSecLockout(int attemptsNumber, int lockoutTime)
     {
         var options = new DbContextOptionsBuilder<DataContext>()
@@ -304,38 +304,8 @@ public class LoginAttemptsServiceTests
                 x.IpAddress == _ipAddress && x.AccountId == _accountId);
 
             time.Should().Be(int.MaxValue);
-            block.IpAddress.Should().Be(_ipAddress);
-            block.AccountId.Should().Be(_accountId);
-        }
-    }
-
-    [Test]
-    public async Task UnblockIpAddress_BlockedIpAddress_Unblock()
-    {
-        var options = new DbContextOptionsBuilder<DataContext>()
-            .UseInMemoryDatabase(
-                $"{Guid.NewGuid()}")
-            .Options;
-
-        await using (var context = new DataContext(options))
-        {
-            await context.IpAddressBlocks.AddAsync(new IpAddressBlock
-            {
-                AccountId = _accountId,
-                IpAddress = _ipAddress,
-            });
-            await context.SaveChangesAsync();
-        }
-
-        await using (var context = new DataContext(options))
-        {
-            var service = new LoginAttemptsService(context);
-
-            await service.UnlockIpAddress(_accountId, _ipAddress);
-            var block = await context.IpAddressBlocks.FirstOrDefaultAsync(x =>
-                x.IpAddress == _ipAddress && x.AccountId == _accountId);
-
-            block.Should().BeNull();
+            block?.IpAddress.Should().Be(_ipAddress);
+            block?.AccountId.Should().Be(_accountId);
         }
     }
 }

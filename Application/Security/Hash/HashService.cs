@@ -10,7 +10,7 @@ public class HashService : IHashService
 
     public HashService(IConfiguration configuration)
     {
-        _pepper = configuration["Pepper"];
+        _pepper = configuration["Pepper"] ?? throw new InvalidOperationException();
     }
 
     public string HashWithSHA512(string text)

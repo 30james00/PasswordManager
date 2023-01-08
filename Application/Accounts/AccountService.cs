@@ -34,6 +34,6 @@ public class AccountService : IAccountService
     public byte[] GetMasterPasswordKey(string password)
     {
         return Convert.FromBase64String(
-            _hashService.HashWithMD5(_hashService.HashWithHMAC(password, _configuration["Pepper"])));
+            _hashService.HashWithMD5(_hashService.HashWithHMAC(password, _configuration["Pepper"] ?? throw new InvalidOperationException())));
     }
 }

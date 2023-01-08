@@ -7,5 +7,4 @@ public interface ILoginAttemptsService
     Task<DateTime?> LastUnsuccessfulLoginAttemptTime(Guid accountId);
     Task<int> ThrottleLogInTime(Guid accountId);
     Task<int> ThrottleIpLogIn(Guid accountId, string ipAddress);
-    Task UnlockIpAddress(Guid accountId, string ipAddress);
 }

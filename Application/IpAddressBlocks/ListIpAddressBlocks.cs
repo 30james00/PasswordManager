@@ -1,8 +1,10 @@
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using PasswordManager.Application.Core;
-using PasswordManager.Application.LoginAttempts.DTOs;
+using PasswordManager.Application.IpAddressBlocks.DTOs;
 using PasswordManager.Application.Security.Token;
 
 namespace PasswordManager.Application.IpAddressBlocks;
@@ -13,11 +15,13 @@ public class
     ListIpAddressBlocksQueryHandler : IRequestHandler<ListIpAddressBlocksQuery, ApiResult<List<IpAddressBlockDto>>>
 {
     private readonly DataContext _context;
+    private readonly IMapper _mapper;
     private readonly IUserAccessor _userAccessor;
 
-    public ListIpAddressBlocksQueryHandler(DataContext context, IUserAccessor userAccessor)
+    public ListIpAddressBlocksQueryHandler(DataContext context, IMapper mapper, IUserAccessor userAccessor)
     {
         _context = context;
+        _mapper = mapper;
         _userAccessor = userAccessor;
     }
 
@@ -29,7 +33,7 @@ public class
         var accountId = Guid.Parse(userId);
 
         return ApiResult<List<IpAddressBlockDto>>.Success(await _context.IpAddressBlocks
-            .Where(x => x.AccountId == accountId).Cast<IpAddressBlockDto>()
+            .Where(x => x.AccountId == accountId).ProjectTo<IpAddressBlockDto>(_mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken));
     }
 }

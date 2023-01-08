@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PasswordManager.Application.Accounts;
 using PasswordManager.Application.Accounts.DTOs;
 using PasswordManager.Application.IpAddressBlocks;
-using PasswordManager.Application.LoginAttempts.DTOs;
+using PasswordManager.Application.IpAddressBlocks.DTOs;
 
 namespace PasswordManager.Controllers;
 
@@ -44,10 +44,9 @@ public class AccountController : BaseApiController
 
     [Authorize]
     [HttpGet("ip-block")]
-    public async Task<ActionResult<List<IpAddressBlockDto>>> ListIpAddressBlocks(
-        ListIpAddressBlocksQuery listIpAddressBlocksQuery)
+    public async Task<ActionResult<List<IpAddressBlockDto>>> ListIpAddressBlocks()
     {
-        return HandleResult(await _mediator.Send(listIpAddressBlocksQuery));
+        return HandleResult(await _mediator.Send(new ListIpAddressBlocksQuery()));
     }
 
     [Authorize]

@@ -1,6 +1,6 @@
 using AutoMapper;
 using Domain;
-using PasswordManager.Application.LoginAttempts.DTOs;
+using PasswordManager.Application.IpAddressBlocks.DTOs;
 using PasswordManager.Application.SavedPasswords.DTOs;
 
 namespace PasswordManager.Application.Core;

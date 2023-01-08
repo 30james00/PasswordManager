@@ -34,7 +34,7 @@ const onResponseError = (error: AxiosError): Promise<AxiosError> => {
   if (error.response?.status == 401)
     toast.error('You are currently not logged in');
   if (error.response?.status == 403) {
-    toast.error(error.response?.data);
+    toast.error(error.response?.data as string);
   }
   if (error.response?.status == 500) toast.error('Server error');
   console.error(`[response error] [${JSON.stringify(error)}]`);

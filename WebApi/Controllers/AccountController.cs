@@ -50,9 +50,9 @@ public class AccountController : BaseApiController
     }
 
     [Authorize]
-    [HttpDelete("ip-block")]
-    public async Task<ActionResult<Unit>> RemoveIpBlock(UnblockIpAddressCommand unblockIpAddressCommand)
+    [HttpDelete("ip-block/{id:guid}")]
+    public async Task<ActionResult> RemoveIpBlock(Guid id)
     {
-        return HandleResult(await _mediator.Send(unblockIpAddressCommand));
+        return HandleResult(await _mediator.Send(new UnblockIpAddressCommand(id)));
     }
 }

@@ -20,7 +20,6 @@ export default defineComponent({
       try {
         let response = await this.$axios.get('/account/ip-block');
         this.ipAddresses = response.data;
-        console.log(this.ipAddresses[1]);
       } catch (e) {
         toast.error('Error refreshing blocked IP addresses');
         return;
@@ -28,7 +27,7 @@ export default defineComponent({
     },
     async handleDelete(savedPassword: IIpAddressBlock): Promise<void> {
       try {
-        await this.$axios.delete(`ip-block/${savedPassword.id}`);
+        await this.$axios.delete(`/account/ip-block/${savedPassword.id}`);
         this.handleRefresh();
       } catch (e) {
         toast.error(`Failed to unlock ${savedPassword.ipAddress}`);
@@ -51,7 +50,7 @@ export default defineComponent({
       :key="ipAddress.id"
     >
       <span :class="$style.ipAddress">{{ ipAddress.ipAddress }}</span>
-      <CustomIconButton icon="fa-solid fa-trash" bg="red" />
+      <CustomIconButton icon="fa-solid fa-trash" bg="red" @click="handleDelete(ipAddress)" />
     </div>
   </div>
 </template>

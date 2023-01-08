@@ -40,7 +40,7 @@ public class DeletePasswordCommandHandler : IRequestHandler<DeletePasswordComman
             await _dataContext.SavedPasswords.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
         if (savedPassword == null) return ApiResult<Unit>.Failure("Chosen Password does not exist");
 
-        //Authorize owner of Password
+        // Authorize owner of Password
         if (account.Id != savedPassword.AccountId) return ApiResult<Unit>.Forbidden();
 
         _dataContext.SavedPasswords.Remove(savedPassword);

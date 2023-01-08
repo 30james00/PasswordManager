@@ -6,7 +6,7 @@ using PasswordManager.Application.Security.Token;
 
 namespace PasswordManager.Application.IpAddressBlocks;
 
-public record UnblockIpAddressCommand(string IpAddress) : IRequest<ApiResult<Unit>>;
+public record UnblockIpAddressCommand(Guid Id) : IRequest<ApiResult<Unit>>;
 
 public class UnblockIpAddressCommandHandler : IRequestHandler<UnblockIpAddressCommand, ApiResult<Unit>>
 {
@@ -21,19 +21,24 @@ public class UnblockIpAddressCommandHandler : IRequestHandler<UnblockIpAddressCo
 
     public async Task<ApiResult<Unit>> Handle(UnblockIpAddressCommand request, CancellationToken cancellationToken)
     {
+        // Get Account Id
         var userId = _userAccessor.GetUserId();
         if (userId == null) return ApiResult<Unit>.Forbidden();
-
         var accountId = Guid.Parse(userId);
 
+        // Get blocked IP
         var block = await _context.IpAddressBlocks.FirstOrDefaultAsync(x =>
-            x.IpAddress == request.IpAddress && x.AccountId == accountId, cancellationToken: cancellationToken);
-        if (block != null)
-        {
-            _context.IpAddressBlocks.Remove(block);
-            await _context.SaveChangesAsync(cancellationToken);
-        }
+            x.Id == request.Id, cancellationToken: cancellationToken);
+        if (block == null) return ApiResult<Unit>.Failure("Chosen IP block does not exist");
 
-        return ApiResult<Unit>.Success(Unit.Value);
+        // Authorize owner of Blocked IP
+        if (block.AccountId != accountId) return ApiResult<Unit>.Forbidden();
+
+        _context.IpAddressBlocks.Remove(block);
+        var result = await _context.SaveChangesAsync(cancellationToken) > 0;
+
+        return result
+            ? ApiResult<Unit>.Success(Unit.Value)
+            : ApiResult<Unit>.Failure("Error removing IP block from database");
     }
 }

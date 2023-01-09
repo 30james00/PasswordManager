@@ -7,7 +7,7 @@ using PasswordManager.Application.Security.Token;
 
 namespace PasswordManager.Application.SharedPasswords;
 
-public record DeleteSharedPasswordCommand(Guid Id, string Login) : IRequest<ApiResult<Unit>>;
+public record DeleteSharedPasswordCommand(Guid Id) : IRequest<ApiResult<Unit>>;
 
 public class DeleteSharedPasswordCommandHandler : IRequestHandler<DeleteSharedPasswordCommand, ApiResult<Unit>>
 {
@@ -29,17 +29,12 @@ public class DeleteSharedPasswordCommandHandler : IRequestHandler<DeleteSharedPa
             await _dataContext.Accounts.FirstOrDefaultAsync(x => x.Id == Guid.Parse(accountId), cancellationToken);
         if (owner == null) return ApiResult<Unit>.Forbidden();
 
-        // Find user to share password
-        var toAccount =
-            await _dataContext.Accounts.FirstOrDefaultAsync(x => x.Login == request.Login, cancellationToken);
-        if (toAccount == null) return ApiResult<Unit>.Failure("User does not exist");
-
         // Get SharedPassword
         var sharedPassword =
             await _dataContext.SharedPasswords.Include(x => x.Account)
                 .Include(x => x.SavedPassword.Account)
                 .FirstOrDefaultAsync(
-                    x => x.SavedPasswordId == request.Id && x.AccountId == toAccount.Id, cancellationToken);
+                    x => x.Id == request.Id, cancellationToken);
         if (sharedPassword == null) return ApiResult<Unit>.Failure("Shared Password does not exist");
 
         // Authorize owner of Password

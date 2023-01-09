@@ -1,10 +1,12 @@
+import type { ISharedPasswordMiniDto } from './sharedPasswordModels';
+
 export interface ISavedPassword {
   id: string;
   password: string;
   login: string;
   webAddress: string;
   description: string;
-  sharedTo: string[];
+  sharedTo: Array<ISharedPasswordMiniDto>;
 }
 
 export interface ICreatePasswordDto {

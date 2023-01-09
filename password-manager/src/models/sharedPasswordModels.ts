@@ -8,7 +8,7 @@ export interface ISharedPassword {
   description: string;
 }
 
-export interface ISharedPasswordEditDeleteDto {
+export interface ISharedPasswordMiniDto {
   id: string;
   login: string;
 }

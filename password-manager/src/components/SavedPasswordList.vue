@@ -79,6 +79,7 @@ export default defineComponent({
           <th scope="col">Description</th>
           <th scope="col">Decrypt</th>
           <th scope="col">Edit</th>
+          <th scope="col">Share</th>
           <th scope="col">Delete</th>
         </tr>
       </thead>

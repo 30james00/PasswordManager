@@ -27,10 +27,10 @@ public class SharedPasswordsController : BaseApiController
     }
 
     [Authorize]
-    [HttpDelete]
-    public async Task<ActionResult> DeleteSharedPassword(DeleteSharedPasswordCommand command)
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult> DeleteSharedPassword(Guid id)
     {
-        return HandleResult(await _mediator.Send(command));
+        return HandleResult(await _mediator.Send(new DeleteSharedPasswordCommand(id)));
     }
 
     [Authorize]

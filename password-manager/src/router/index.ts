@@ -3,9 +3,9 @@ import EditPassword from '@/views/EditPassword.vue';
 import CreatePassword from '@/views/CreatePassword.vue';
 import Login from '@/views/Login.vue';
 import Register from '@/views/Register.vue';
-import SavedPasswordList from '@/components/SavedPasswordList.vue';
+import SharePassword from '@/views/SharePassword.vue';
 import AccountDetails from '@/views/AccountDetails.vue';
-import HomeView from '@/views/HomeView.vue'
+import HomeView from '@/views/HomeView.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
@@ -42,6 +42,12 @@ const router = createRouter({
       component: EditPassword,
       props: true,
     },
+    {
+      path: '/passwords/share/:passwordId',
+      name: 'password-share',
+      component: SharePassword,
+      props: true,
+    },
     // {
     //   path: "/about",
     //   name: "about",
@@ -55,10 +61,12 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   const accountStore = useAccountStore();
-  const toName = to.name?.toString() ?? ""
+  const toName = to.name?.toString() ?? '';
 
-  if (!['register', 'login'].includes(toName) && !accountStore.isLoggedIn) return { name: 'login' };
-  if (['register', 'login'].includes(toName) && accountStore.isLoggedIn) return { name: 'password-list' };
+  if (!['register', 'login'].includes(toName) && !accountStore.isLoggedIn)
+    return { name: 'login' };
+  if (['register', 'login'].includes(toName) && accountStore.isLoggedIn)
+    return { name: 'password-list' };
 });
 
 export default router;

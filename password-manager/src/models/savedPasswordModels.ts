@@ -4,6 +4,7 @@ export interface ISavedPassword {
   login: string;
   webAddress: string;
   description: string;
+  sharedTo: string[];
 }
 
 export interface ICreatePasswordDto {

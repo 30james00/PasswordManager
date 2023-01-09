@@ -6,4 +6,5 @@ public class SavedPasswordDto
     public string WebAddress { get; set; } = null!;
     public string? Description { get; set; }
     public string? Login { get; set; }
+    public List<string> SharedTo { get; set; }
 }

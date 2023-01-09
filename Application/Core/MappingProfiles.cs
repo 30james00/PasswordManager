@@ -10,7 +10,9 @@ public class MappingProfiles : Profile
 {
     public MappingProfiles()
     {
-        CreateMap<SavedPassword, SavedPasswordDto>();
+        CreateMap<SavedPassword, SavedPasswordDto>()
+            .ForMember(x => x.SharedTo,
+                o => o.MapFrom(x => x.SharedPasswords.Select(s => s.Account).Select(a => a.Login).ToList()));
 
         CreateMap<SharedPassword, SharedPasswordDto>()
             .ForMember(x => x.Owner, o => o.MapFrom(x => x.SavedPassword.Account.Login))

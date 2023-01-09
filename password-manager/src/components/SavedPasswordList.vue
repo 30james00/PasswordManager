@@ -44,6 +44,12 @@ export default defineComponent({
         params: { passwordId: savedPassword.id },
       });
     },
+    handleShare(savedPassword: ISavedPassword): void {
+      this.$router.push({
+        name: 'password-share',
+        params: { passwordId: savedPassword.id },
+      });
+    },
     async handleDelete(savedPassword: ISavedPassword): Promise<void> {
       try {
         await this.$axios.delete(`savedPasswords/${savedPassword.id}`);
@@ -90,6 +96,11 @@ export default defineComponent({
           <td data-label="Edit" @click="handleEdit(savedPassword)">
             <div :class="$style.tbutton">
               <CustomIconButton icon="fa-solid fa-pen" bg="#279AF1" />
+            </div>
+          </td>
+          <td data-label="Share" @click="handleShare(savedPassword)">
+            <div :class="$style.tbutton">
+              <CustomIconButton icon="fa-solid fa-share-nodes" bg="#2e0142" />
             </div>
           </td>
           <td data-label="Delete" @click="handleDelete(savedPassword)">

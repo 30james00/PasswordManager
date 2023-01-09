@@ -29,6 +29,9 @@ public class CreateSharedPasswordCommandHandler : IRequestHandler<CreateSharedPa
             await _dataContext.Accounts.FirstOrDefaultAsync(x => x.Id == Guid.Parse(accountId), cancellationToken);
         if (owner == null) return ApiResult<Unit>.Forbidden();
 
+        // Check if user shares to himself
+        if (owner.Login == request.Login) return ApiResult<Unit>.Failure("You can't share password with yourself");
+
         // Get SavedPassword
         var savedPassword =
             await _dataContext.SavedPasswords.Include(x => x.Account)

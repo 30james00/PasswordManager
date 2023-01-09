@@ -12,9 +12,13 @@ export default defineComponent({
   data() {
     return {
       savedPasswords: [] as ISavedPassword[],
+      editMode: false,
     };
   },
   methods: {
+    toogleEditMode(): void {
+      this.editMode = !this.editMode;
+    },
     async handleRefresh(): Promise<void> {
       try {
         let response = await this.$axios.get('/savedPasswords');
@@ -69,7 +73,14 @@ export default defineComponent({
 
 <template>
   <div :class="$style.component">
-    <CustomButton @click="handleAddNew" text="Add New Password" />
+    <div :class="$style.buttons">
+      <CustomButton @click="handleAddNew" text="Add New Password" />
+      <CustomButton
+        @click="toogleEditMode"
+        v-bind:text="`Turn ${editMode ? 'off' : 'on'} EditMode`"
+        :bg="editMode ? '#aa0000' : '#00aa00'"
+      />
+    </div>
     <p v-if="savedPasswords.length == 0"><i>No Saved Passwords</i></p>
     <table v-if="savedPasswords.length > 0">
       <thead>
@@ -79,9 +90,9 @@ export default defineComponent({
           <th scope="col">Website</th>
           <th scope="col">Description</th>
           <th scope="col">Decrypt</th>
-          <th scope="col">Edit</th>
-          <th scope="col">Share</th>
-          <th scope="col">Delete</th>
+          <th v-if="editMode" scope="col">Edit</th>
+          <th v-if="editMode" scope="col">Share</th>
+          <th v-if="editMode" scope="col">Delete</th>
         </tr>
       </thead>
       <tbody>
@@ -95,17 +106,29 @@ export default defineComponent({
               <CustomIconButton icon="fa-solid fa-key" />
             </div>
           </td>
-          <td data-label="Edit" @click="handleEdit(savedPassword)">
+          <td
+            v-if="editMode"
+            data-label="Edit"
+            @click="handleEdit(savedPassword)"
+          >
             <div :class="$style.tbutton">
               <CustomIconButton icon="fa-solid fa-pen" bg="#279AF1" />
             </div>
           </td>
-          <td data-label="Share" @click="handleShare(savedPassword)">
+          <td
+            v-if="editMode"
+            data-label="Share"
+            @click="handleShare(savedPassword)"
+          >
             <div :class="$style.tbutton">
               <CustomIconButton icon="fa-solid fa-share-nodes" bg="#2e0142" />
             </div>
           </td>
-          <td data-label="Delete" @click="handleDelete(savedPassword)">
+          <td
+            v-if="editMode"
+            data-label="Delete"
+            @click="handleDelete(savedPassword)"
+          >
             <div :class="$style.tbutton">
               <CustomIconButton icon="fa-solid fa-trash" bg="red" />
             </div>
@@ -126,6 +149,11 @@ export default defineComponent({
 
 .tbutton {
   @include col;
+}
+
+.buttons {
+  @include row;
+  gap: 1em;
 }
 
 @media screen and (max-width: 700px) {

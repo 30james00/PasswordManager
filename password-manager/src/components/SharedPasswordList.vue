@@ -78,11 +78,22 @@ export default defineComponent({
 
 .component {
   @include col;
+  width: 100%;
 }
 
 .tbutton {
   @include col;
 }
+
+@media screen and (max-width: 700px) {
+  .tbutton {
+    align-items: flex-end;
+  }
+}
+</style>
+
+<style lang="scss" scoped>
+@import '@/scss/variables.scss';
 
 table {
   border-collapse: collapse;

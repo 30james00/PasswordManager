@@ -22,7 +22,7 @@ export default defineComponent({
     async handleEdit(): Promise<void> {
       try {
         await this.$axios.patch('/savedPasswords', this.editPassword);
-        this.$router.push({ name: 'password-list' });
+        this.$router.push({ name: 'home' });
       } catch (e) {
         this.toast.error('Error editing SavedPasswords');
         return;

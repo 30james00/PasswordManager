@@ -26,5 +26,6 @@ export default defineComponent({
 
 .component {
   @include col;
+  width: 100%;
 }
 </style>

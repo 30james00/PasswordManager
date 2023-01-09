@@ -1,7 +1,6 @@
 <script lang="ts">
-
 import { defineComponent } from '@vue/runtime-dom';
-import type { ISavedPassword } from '@/models/savedPasswordModels'
+import type { ISavedPassword } from '@/models/savedPasswordModels';
 import { useToast } from 'vue-toastification';
 import CustomButton from '@/components/CustomButton.vue';
 import CustomIconButton from '@/components/CustomIconButton.vue';
@@ -9,7 +8,7 @@ import CustomIconButton from '@/components/CustomIconButton.vue';
 const toast = useToast();
 
 export default defineComponent({
-  name: "SavedPasswordList",
+  name: 'SavedPasswordList',
   data() {
     return {
       savedPasswords: [] as ISavedPassword[],
@@ -18,36 +17,38 @@ export default defineComponent({
   methods: {
     async handleRefresh(): Promise<void> {
       try {
-        let response = await this.$axios.get("/savedPasswords");
+        let response = await this.$axios.get('/savedPasswords');
         this.savedPasswords = response.data;
-      }
-      catch (e) {
-        toast.error("Error refreshing SavedPasswords");
+      } catch (e) {
+        toast.error('Error refreshing SavedPasswords');
         return;
       }
     },
     handleAddNew(): void {
-      this.$router.push({ name: "password-create" });
+      this.$router.push({ name: 'password-create' });
     },
     async handleDecrypt(savedPassword: ISavedPassword): Promise<void> {
       try {
-        let response = await this.$axios.get(`savedPasswords/decrypt/${savedPassword.id}`);
+        let response = await this.$axios.get(
+          `savedPasswords/decrypt/${savedPassword.id}`
+        );
         savedPassword.password = response.data;
-      }
-      catch (e) {
+      } catch (e) {
         toast.error(`Failed to decrypt ${savedPassword.login} password`);
         return;
       }
     },
     handleEdit(savedPassword: ISavedPassword): void {
-      this.$router.push({ name: "password-edit", params: { passwordId: savedPassword.id } });
+      this.$router.push({
+        name: 'password-edit',
+        params: { passwordId: savedPassword.id },
+      });
     },
     async handleDelete(savedPassword: ISavedPassword): Promise<void> {
       try {
         await this.$axios.delete(`savedPasswords/${savedPassword.id}`);
         this.handleRefresh();
-      }
-      catch (e) {
+      } catch (e) {
         toast.error(`Failed to delete ${savedPassword.login} password`);
         return;
       }
@@ -56,7 +57,7 @@ export default defineComponent({
   async created() {
     await this.handleRefresh();
   },
-  components: { CustomButton, CustomIconButton }
+  components: { CustomButton, CustomIconButton },
 });
 </script>
 
@@ -78,7 +79,7 @@ export default defineComponent({
       <tbody>
         <tr v-for="savedPassword in savedPasswords" :key="savedPassword.id">
           <td scope="row" data-label="Login">{{ savedPassword.login }}</td>
-          <td data-label="Password">{{ savedPassword.password ?? "***" }}</td>
+          <td data-label="Password">{{ savedPassword.password ?? '***' }}</td>
           <td data-label="Website">{{ savedPassword.webAddress }}</td>
           <td data-label="Description">{{ savedPassword.description }}</td>
           <td data-label="Decrypt" @click="handleDecrypt(savedPassword)">
@@ -107,11 +108,22 @@ export default defineComponent({
 
 .component {
   @include col;
+  width: 100%;
 }
 
 .tbutton {
   @include col;
 }
+
+@media screen and (max-width: 700px) {
+  .tbutton {
+    align-items: flex-end;
+  }
+}
+</style>
+
+<style lang="scss" scoped>
+@import '@/scss/variables.scss';
 
 table {
   border-collapse: collapse;
@@ -120,17 +132,17 @@ table {
 }
 
 table tr {
-  padding: .35em;
+  padding: 0.35em;
 }
 
 table th,
 table td {
-  padding: .625em;
+  padding: 0.625em;
   text-align: center;
 }
 
 table th {
-  color: $light
+  color: $light;
 }
 
 @media screen and (max-width: 700px) {
@@ -153,7 +165,7 @@ table th {
   table tr {
     border: 3px solid $light;
     display: block;
-    margin-bottom: .625em;
+    margin-bottom: 0.625em;
     border-radius: 1em;
   }
 
@@ -162,7 +174,7 @@ table th {
     align-items: center;
     border-bottom: 1px solid #ddd;
     color: $light;
-    font-size: .8em;
+    font-size: 0.8em;
     justify-content: space-between;
   }
 
@@ -173,10 +185,6 @@ table th {
 
   table td:last-child {
     border-bottom: 0;
-  }
-
-  .tbutton {
-    align-items: flex-end;
   }
 }
 </style>

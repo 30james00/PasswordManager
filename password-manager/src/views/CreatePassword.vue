@@ -15,7 +15,7 @@ export default defineComponent({
     async handleCreate(): Promise<void> {
       try {
         await this.$axios.post('/savedPasswords', this.createPassword);
-        this.$router.push({ name: 'password-list' });
+        this.$router.push({ name: 'home' });
       } catch (e) {
         useToast().error('Error saving new Password');
         return;

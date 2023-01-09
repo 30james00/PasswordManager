@@ -9,7 +9,7 @@ namespace PasswordManager.Application.SharedPasswords;
 
 public record DeleteSharedPasswordCommand(Guid Id, string Login) : IRequest<ApiResult<Unit>>;
 
-public class DeleteSharedPasswordCommandHandler : IRequestHandler<CreateSharedPasswordCommand, ApiResult<Unit>>
+public class DeleteSharedPasswordCommandHandler : IRequestHandler<DeleteSharedPasswordCommand, ApiResult<Unit>>
 {
     private readonly DataContext _dataContext;
     private readonly IUserAccessor _userAccessor;
@@ -20,7 +20,7 @@ public class DeleteSharedPasswordCommandHandler : IRequestHandler<CreateSharedPa
         _userAccessor = userAccessor;
     }
 
-    public async Task<ApiResult<Unit>> Handle(CreateSharedPasswordCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResult<Unit>> Handle(DeleteSharedPasswordCommand request, CancellationToken cancellationToken)
     {
         // Get Account
         var accountId = _userAccessor.GetUserId();
@@ -36,12 +36,14 @@ public class DeleteSharedPasswordCommandHandler : IRequestHandler<CreateSharedPa
 
         // Get SharedPassword
         var sharedPassword =
-            await _dataContext.SharedPasswords.Include(x => x.Account).FirstOrDefaultAsync(
-                x => x.SavedPasswordId == request.Id && x.AccountId == toAccount.Id, cancellationToken);
+            await _dataContext.SharedPasswords.Include(x => x.Account)
+                .Include(x => x.SavedPassword.Account)
+                .FirstOrDefaultAsync(
+                    x => x.SavedPasswordId == request.Id && x.AccountId == toAccount.Id, cancellationToken);
         if (sharedPassword == null) return ApiResult<Unit>.Failure("Shared Password does not exist");
 
         // Authorize owner of Password
-        if (owner.Id != sharedPassword.Account.Id) return ApiResult<Unit>.Forbidden();
+        if (owner.Id != sharedPassword.SavedPassword.Account.Id) return ApiResult<Unit>.Forbidden();
 
         // Save to Database
         _dataContext.SharedPasswords.Remove(sharedPassword);

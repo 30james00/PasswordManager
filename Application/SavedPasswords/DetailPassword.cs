@@ -39,7 +39,7 @@ public class DetailPasswordQueryHandler : IRequestHandler<DetailPasswordQuery, A
             await _dataContext.SavedPasswords.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
         if (savedPassword == null) return ApiResult<SavedPasswordDto>.Failure("Chosen Password does not exist");
 
-        //Authorize owner of Password
+        // Authorize owner of Password
         if (account.Id != savedPassword.AccountId) return ApiResult<SavedPasswordDto>.Forbidden();
 
         return ApiResult<SavedPasswordDto>.Success(_mapper.Map<SavedPassword, SavedPasswordDto>(savedPassword));

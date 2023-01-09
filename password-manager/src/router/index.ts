@@ -3,8 +3,9 @@ import EditPassword from '@/views/EditPassword.vue';
 import CreatePassword from '@/views/CreatePassword.vue';
 import Login from '@/views/Login.vue';
 import Register from '@/views/Register.vue';
-import SavedPasswordList from '@/views/SavedPasswordList.vue';
+import SavedPasswordList from '@/components/SavedPasswordList.vue';
 import AccountDetails from '@/views/AccountDetails.vue';
+import HomeView from '@/views/HomeView.vue'
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
@@ -27,8 +28,8 @@ const router = createRouter({
     },
     {
       path: '/',
-      name: 'password-list',
-      component: SavedPasswordList,
+      name: 'home',
+      component: HomeView,
     },
     {
       path: '/passwords/create',

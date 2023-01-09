@@ -12,24 +12,31 @@ public class SharedPasswordsController : BaseApiController
     {
     }
 
-    [HttpGet]
     [Authorize]
+    [HttpGet]
     public async Task<ActionResult<List<SharedPasswordDto>>> ListSharedPassword()
     {
         return HandleResult(await _mediator.Send(new ListSharedPasswordQuery()));
     }
 
-    [HttpPost]
     [Authorize]
+    [HttpPost]
     public async Task<ActionResult> CreateSharedPassword(CreateSharedPasswordCommand command)
     {
         return HandleResult(await _mediator.Send(command));
     }
 
-    [HttpDelete]
     [Authorize]
+    [HttpDelete]
     public async Task<ActionResult> DeleteSharedPassword(DeleteSharedPasswordCommand command)
     {
         return HandleResult(await _mediator.Send(command));
+    }
+
+    [Authorize]
+    [HttpGet("decrypt/{id:guid}")]
+    public async Task<ActionResult<string>> DecryptSharedPassword(Guid id)
+    {
+        return HandleResult(await _mediator.Send(new DecryptSharedPasswordQuery(id)));
     }
 }

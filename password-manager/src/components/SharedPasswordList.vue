@@ -28,7 +28,7 @@ export default defineComponent({
     async handleDecrypt(sharedPassword: ISharedPassword): Promise<void> {
       try {
         let response = await this.$axios.get(
-          `savedPasswords/decrypt/${sharedPassword.savedPasswordId}`
+          `sharedPasswords/decrypt/${sharedPassword.id}`
         );
         sharedPassword.password = response.data;
       } catch (e) {

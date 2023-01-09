@@ -37,7 +37,7 @@ public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand,
     public async Task<ApiResult<AccountDto>> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
     {
         if (await _dataContext.Accounts.FirstOrDefaultAsync(x => x.Login == request.Login, cancellationToken) != null)
-            return ApiResult<AccountDto>.Failure("Login already user");
+            return ApiResult<AccountDto>.Failure("Login already used");
 
         // Generate new salt and hash
         var salt = _accountService.GenerateSalt();

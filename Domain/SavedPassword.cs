@@ -11,4 +11,5 @@ public class SavedPassword
 
     public Account Account { get; set; } = null!;
     public Guid AccountId { get; set; }
+    public ICollection<SharedPassword> SharedPasswords { get; set; } = new List<SharedPassword>();
 }

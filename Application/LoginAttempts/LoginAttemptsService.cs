@@ -53,12 +53,12 @@ public class LoginAttemptsService : ILoginAttemptsService
 
         switch (unsuccessfulAttempts)
         {
-            case >= 4:
+            case >= 5:
                 return 120;
-            case 3:
+            case >= 4:
+                return 20;
+            case >= 3:
                 return 10;
-            case 2:
-                return 5;
         }
 
         return 0;
@@ -87,10 +87,10 @@ public class LoginAttemptsService : ILoginAttemptsService
                     { IpAddress = ipAddress, AccountId = accountId });
                 await _context.SaveChangesAsync();
                 return int.MaxValue;
-            case 15:
-                return 100;
-            case 10:
-                return 50;
+            case >= 15:
+                return 1000;
+            case >= 10:
+                return 500;
         }
 
         return 0;

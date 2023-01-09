@@ -11,9 +11,9 @@ import router from './router';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faKey, faPen, faTrash, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faKey, faPen, faShareNodes, faTrash, faUser } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faUser, faPen, faKey, faTrash);
+library.add(faUser, faPen, faKey, faShareNodes, faTrash);
 
 const app = createApp(App);
 

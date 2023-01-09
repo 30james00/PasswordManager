@@ -7,7 +7,7 @@ namespace PasswordManager.Application.Core
         public T? Value { get; set; }
         public string? Error { get; set; }
 
-        public static ApiResult<T> Success(T value) => new ApiResult<T>
+        public static ApiResult<T> Success(T? value) => new ApiResult<T>
             { IsSuccess = true, IsForbidden = false, Value = value };
 
         public static ApiResult<T> Failure(string error) => new ApiResult<T>

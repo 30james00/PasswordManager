@@ -12,6 +12,7 @@ public class DataContext : DbContext
 
     public DbSet<Account> Accounts { get; set; }
     public DbSet<SavedPassword> SavedPasswords { get; set; }
+    public DbSet<SharedPassword> SharedPasswords { get; set; }
     public DbSet<LoginAttempt> LoginAttempts { get; set; }
     public DbSet<IpAddressBlock> IpAddressBlocks { get; set; }
 

@@ -18,7 +18,7 @@ export const useAccountStore = defineStore('account', {
 
       // store user details and jwt in local storage to keep user logged in between page refreshes
       localStorage.setItem('account', JSON.stringify(account));
-      router.push({ name: 'password-list' });
+      router.push({ name: 'home' });
     },
     logout(): void {
       this.account = null;

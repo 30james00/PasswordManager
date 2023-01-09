@@ -1,4 +1,5 @@
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Domain;
 using Infrastructure;
 using MediatR;
@@ -35,13 +36,9 @@ public class DetailPasswordQueryHandler : IRequestHandler<DetailPasswordQuery, A
         if (account == null) return ApiResult<SavedPasswordDto>.Forbidden();
 
         // Get SavedPassword
-        var savedPassword =
-            await _dataContext.SavedPasswords.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
-        if (savedPassword == null) return ApiResult<SavedPasswordDto>.Failure("Chosen Password does not exist");
-
-        //Authorize owner of Password
-        if (account.Id != savedPassword.AccountId) return ApiResult<SavedPasswordDto>.Forbidden();
-
-        return ApiResult<SavedPasswordDto>.Success(_mapper.Map<SavedPassword, SavedPasswordDto>(savedPassword));
+        return ApiResult<SavedPasswordDto>.Success(
+            await _dataContext.SavedPasswords.Where(x => x.Account.Id == account.Id)
+                .ProjectTo<SavedPasswordDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken));
     }
 }

@@ -7,7 +7,8 @@ public class Account
     public string PasswordHash { get; set; } = null!;
     public string Salt { get; set; } = null!;
     public bool IsPasswordKeptAsHash { get; set; }
-    public List<SavedPassword> SavedPasswords { get; set; } = new List<SavedPassword>();
-    public List<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
-    public List<LoginAttempt> LoginAttempts { get; set; } = new List<LoginAttempt>();
+    public ICollection<SavedPassword> SavedPasswords { get; set; } = new List<SavedPassword>();
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+    public ICollection<LoginAttempt> LoginAttempts { get; set; } = new List<LoginAttempt>();
+    public ICollection<SharedPassword> SharedPasswords { get; set; } = new List<SharedPassword>();
 }

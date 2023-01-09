@@ -46,7 +46,8 @@ export default defineComponent({
 
 <template>
   <div :class="$style.component">
-    <table>
+    <p v-if="sharedPasswords.length == 0"><i>No Shared Passwords</i></p>
+    <table v-if="sharedPasswords.length > 0">
       <thead>
         <tr>
           <th scope="col">Login</th>

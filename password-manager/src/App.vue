@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { RouterView } from "vue-router";
-import AccountInfo from "./components/AccountInfo.vue";
+import { RouterView } from 'vue-router';
+import AccountInfo from './components/AccountInfo.vue';
 </script>
 
 <template>
   <header :class="$style.header">
-    <div :class="$style.top">
-      <img :class="$style.logo" src="@/assets/logo.svg" alt="Logo">
-      <h1 :class="$style.title">PasswordManager</h1>
-    </div>
+    <RouterLink class="nav-link" :to="{ name: 'home' }">
+      <div :class="$style.top">
+        <img :class="$style.logo" src="@/assets/logo.svg" alt="Logo" />
+        <h1 :class="$style.title">PasswordManager</h1>
+      </div>
+    </RouterLink>
     <AccountInfo />
   </header>
   <router-view v-slot="{ Component }">
@@ -25,7 +27,7 @@ import AccountInfo from "./components/AccountInfo.vue";
   @include row;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: .5em;
+  margin-bottom: 0.5em;
   width: 100%;
 }
 
@@ -46,7 +48,7 @@ import AccountInfo from "./components/AccountInfo.vue";
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-size: 1.15em;
-  margin-left: .5em;
+  margin-left: 0.5em;
 }
 
 @media screen and (min-width: 400px) {

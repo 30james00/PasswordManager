@@ -70,7 +70,8 @@ export default defineComponent({
 <template>
   <div :class="$style.component">
     <CustomButton @click="handleAddNew" text="Add New Password" />
-    <table>
+    <p v-if="savedPasswords.length == 0"><i>No Saved Passwords</i></p>
+    <table v-if="savedPasswords.length > 0">
       <thead>
         <tr>
           <th scope="col">Login</th>

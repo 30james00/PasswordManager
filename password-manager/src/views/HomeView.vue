@@ -14,9 +14,9 @@ export default defineComponent({
 
 <template>
   <div :class="$style.component">
-    <h2>Saved Password</h2>
+    <h2>Saved Passwords</h2>
     <SavedPasswordList/>
-    <h2>Saved Password</h2>
+    <h2>Shared Passwords</h2>
     <SharedPasswordList />
   </div>
 </template>
